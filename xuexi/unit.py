@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-'''
+"""
 @project: AutoXue
 @file: unit.py
 @author: kessil
 @contact: https://github.com/kessil/AutoXue/
 @time: 2019-10-25(星期五) 21:44
 @Copyright © 2019. All rights reserved.
-'''
+"""
 import time
 import logging
 from pathlib import Path
@@ -53,8 +53,9 @@ class Timer:
 
 
 cfg = ConfigParser()
-cfg.read('./config/default.ini', encoding='utf-8')
-cfg.read('./config/custom.ini', encoding='utf-8')
+cfg.read('../config/default.ini', encoding='utf-8')
+
+# cfg.read('./config/custom.ini', encoding='utf-8')
 
 
 def create_logger(loggername:str='logger', levelname:str='DEBUG', console_levelname='INFO'):

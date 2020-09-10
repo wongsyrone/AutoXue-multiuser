@@ -22,9 +22,9 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from .unit import Timer, logger, caps, rules, cfg
-from .model import BankQuery
-from .secureRandom import SecureRandom as random
+from xuexi.unit import Timer, logger, caps, rules, cfg
+from xuexi.model import BankQuery
+from xuexi.secureRandom import SecureRandom as random
 
 
 class Automation:

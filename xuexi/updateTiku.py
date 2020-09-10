@@ -15,7 +15,7 @@ import requests
 from lxml import etree
 from bs4 import BeautifulSoup
 import re
-
+from xuexi.model_local import BankQuery
 
 # from unit import cfg, logger
 
@@ -63,6 +63,7 @@ class Tiku:
     def get_tiku(self):
         # 打开题库文件
         out_file = open("../data1.json", "w", encoding='utf8')
+        out_file.write("[\n")
         # 判断URL链接
         url = "https://github.com/ztianming/xuexi.cn"
         headers = self.headers
@@ -79,7 +80,7 @@ class Tiku:
             pattern = re.compile('^[1-9]\\d*、')
             if pattern.search(tag.contents[0]) is not None:
                 # 插入题目
-                item_tiku['content'] = tag.contents[0]
+                item_tiku['content'] = pattern.sub("", tag.contents[0].replace("_", " "))  # 替换掉标题和下划线
                 answeroptions = []
             # 判断adcd选项
             pattern = re.compile('^[A-Z]、')
@@ -101,10 +102,15 @@ class Tiku:
                 # print(item_tiku)
                 # item_all.append(item_tiku)
                 json.dump(item_tiku, out_file, indent=6, ensure_ascii=False)
+                out_file.write(",\n")
 
         # json.dump(item_all, out_file, indent=6, ensure_ascii=False)
+        out_file.write("]\n")
+        out_file.close()
 
 
 if __name__ == "__main__":
     xuexitiaozhan = Tiku()
-    xuexitiaozhan.get_tiku()
+    # xuexitiaozhan.get_tiku()
+    bq = BankQuery()
+    bq.post("")
