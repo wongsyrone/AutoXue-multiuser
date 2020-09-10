@@ -124,7 +124,11 @@ class Automation:
         logger.debug(f'safe click {ele}')
         button = self.wait.until(EC.presence_of_element_located((By.XPATH, ele)))
         # button = self.find_element(ele)
-        button.click()
+        try:
+            button.click()
+        except Exception as ex:
+            print(ex)
+            return
         time.sleep(1)  # 点击后延时1秒，如果模拟器渲染较慢，可以适当增大这个延时
 
     # def __del__(self):
@@ -193,7 +197,7 @@ class App(Automation):
         password.send_keys(self.password)
         self.safe_click(rules["login_submit"])
         logger.info(f'开始学习{self.username}的账号')
-        time.sleep(8)
+        time.sleep(15)
         try:
             home = self.driver.find_element_by_xpath(rules["home_entry"])
             logger.debug(f'无需点击同意条款按钮')
@@ -226,7 +230,7 @@ class App(Automation):
 
         # print(self.score)
         for i in self.score:
-            logger.debug(f'{i}, {self.score[i]}')
+            # logger.debug(f'{i}, {self.score[i]}')
             logger.info(f'{i}, {self.score[i]}')
         self.safe_back('score -> home')
 
@@ -247,7 +251,7 @@ class App(Automation):
             logger.info(f'根据经验: {chr(len(options) + 64)} 很可能是正确答案')
             return chr(len(options) + 64)
         # url = quote('https://www.baidu.com/s?wd=' + content, safe=string.printable)
-        url = quote("https://www.sogou.com/web?query=" + content, safe=string.printable)
+        url = quote("http://www.sogou.com/web?query=" + content, safe=string.printable)
         response = requests.get(url, headers=self.headers).text
         counts = []
         for i, option in zip(['A', 'B', 'C', 'D', 'E', 'F'], options):
@@ -767,7 +771,7 @@ class App(Automation):
             self.read_count = 0
             self.read_delay = random.randint(45, 60)
         else:
-            self.read_count = t-g
+            self.read_count = t - g
             # self.read_count = random.randint(
             #     cfg.getint('prefers', 'article_count_min'),
             #     cfg.getint('prefers', 'article_count_max'))
@@ -775,16 +779,16 @@ class App(Automation):
         logger.debug(f'我要选读文章: {self.read_count}')
 
     def _star_once(self):
-        if self.back_or_not("收藏"):
-            return
+        # if self.back_or_not("收藏"):
+        #     return
         logger.debug(f'这篇文章真是妙笔生花呀！收藏啦！')
         self.safe_click(rules['article_stars'])
         # self.safe_click(rules['article_stars']) # 取消收藏
 
     def _comments_once(self, title="好好学习，天天强国"):
         # return # 拒绝留言
-        if self.back_or_not("发表观点"):
-            return
+        # if self.back_or_not("发表观点"):
+        #     return
         logger.debug(f'哇塞，这么精彩的文章必须留个言再走！')
         self.safe_click(rules['article_comments'])
         edit_area = self.wait.until(EC.presence_of_element_located((By.XPATH, rules['article_comments_edit'])))
@@ -797,8 +801,8 @@ class App(Automation):
         self.safe_click(rules['article_comments_delete_confirm'])
 
     def _share_once(self):
-        if self.back_or_not("分享"):
-            return
+        # if self.back_or_not("分享"):
+        #     return
         logger.debug(f'好东西必须和好基友分享，走起，转起！')
         self.safe_click(rules['article_share'])
         self.safe_click(rules['article_share_xuexi'])
@@ -845,7 +849,7 @@ class App(Automation):
                 article.click()
                 num -= 1
                 logger.info(f'<{num}> 当前篇目 {title}')
-                article_delay = random.randint(120, 120 + min(10, self.read_count))
+                article_delay = random.randint(10, 10 + min(10, self.read_count))
                 logger.info(f'阅读时间估计 {article_delay} 秒...')
                 while article_delay > 0:
                     if article_delay < 20:
@@ -864,7 +868,8 @@ class App(Automation):
                         comment_area = self.driver.find_element_by_xpath(rules['article_comments'])
                         self._star_share_comments(title)
                         ssc_count -= 1
-                    except:
+                    except Exception as ex:
+                        logger.info(f'评论转发出现异常：    %s' % ex)
                         logger.debug('这是一篇关闭评论的文章，收藏分享留言过程出现错误')
 
                 self.titles.append(title)
@@ -893,10 +898,11 @@ class App(Automation):
                 except:
                     logger.debug(f'这篇文章应该不是摄影集了吧')
                 article.click()
-                ssc_count -= 1
+                # ssc_count -= 1
                 logger.info(f'<{ssc_count}> 当前篇目 {title}')
-                article_delay = 5
+                article_delay = 10
                 logger.info(f'阅读时间估计 {article_delay} 秒...')
+                time.sleep(5)
                 # while article_delay > 0:
                 #     if article_delay < 20:
                 #         delay = article_delay
@@ -908,11 +914,12 @@ class App(Automation):
                 #     self.swipe_up()
                 # else:
                 #     logger.debug(f'完成阅读 {title}')
+                ssc_count = ssc_count - 1
                 try:
                     comment_area = self.driver.find_element_by_xpath(rules['article_comments'])
                     self._star_share_comments(title)
-                    ssc_count -= 1
-                except:
+                except Exception as ex:
+                    logger.info(f'转发评论出现如下异常    %s' % ex)
                     logger.debug('这是一篇关闭评论的文章，收藏分享留言过程出现错误')
 
                 self.titles.append(title)
@@ -945,6 +952,7 @@ class App(Automation):
             self.safe_back('学习平台 -> 文章列表')
 
     def read(self):
+        logger.info(f"阅读 {self.read_count} 篇文章")
         if 0 == self.read_count:
             g, t = self.score["本地频道"]
             if t == g:
@@ -1018,10 +1026,12 @@ class App(Automation):
                 self.video_count = 0
                 self.view_delay = random.randint(15, 30)
             else:
-                self.video_count = random.randint(
-                    cfg.getint('prefers', 'video_count_min'),
-                    cfg.getint('prefers', 'video_count_max'))
-                self.view_delay = self.view_time // self.video_count + 1
+                # self.video_count = random.randint(
+                #     cfg.getint('prefers', 'video_count_min'),
+                #     cfg.getint('prefers', 'video_count_max'))
+                # self.view_delay = self.view_time // self.video_count + 1
+                self.video_count = t - g
+                self.view_delay = 120
         logger.debug(f'视听学习: {self.video_count}')
 
     def music(self):
