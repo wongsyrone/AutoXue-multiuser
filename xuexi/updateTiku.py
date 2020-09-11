@@ -15,7 +15,8 @@ import requests
 from lxml import etree
 from bs4 import BeautifulSoup
 import re
-from xuexi.model_local import BankQuery
+from xuexi.model_local import TikuQuery
+
 
 # from unit import cfg, logger
 
@@ -62,7 +63,7 @@ class Tiku:
     # 获取试题
     def get_tiku(self):
         # 打开题库文件
-        out_file = open("../data1.json", "w", encoding='utf8')
+        out_file = open("./data1.json", "w", encoding='utf8')
         out_file.write("[\n")
         # 判断URL链接
         url = "https://github.com/ztianming/xuexi.cn"
@@ -80,7 +81,11 @@ class Tiku:
             pattern = re.compile('^[1-9]\\d*、')
             if pattern.search(tag.contents[0]) is not None:
                 # 插入题目
-                item_tiku['content'] = pattern.sub("", tag.contents[0].replace("_", " "))  # 替换掉标题和下划线
+                re.sub("\"", " ", item_tiku['content'])
+                item_tiku['content'] = pattern.sub("", tag.contents[0].replace("_", ""))  # 替换掉标题和下划线
+                item_tiku['content'] = re.sub("\"", "", item_tiku['content'])
+                item_tiku['content'] = re.sub("（ ）", "", item_tiku['content'])
+                # print(item_tiku['content'] )
                 answeroptions = []
             # 判断adcd选项
             pattern = re.compile('^[A-Z]、')
@@ -111,6 +116,6 @@ class Tiku:
 
 if __name__ == "__main__":
     xuexitiaozhan = Tiku()
-    # xuexitiaozhan.get_tiku()
-    bq = BankQuery()
-    bq.post("")
+    xuexitiaozhan.get_tiku()
+    # bq = TikuQuery()
+    # bq.post("")

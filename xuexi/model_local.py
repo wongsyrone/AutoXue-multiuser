@@ -40,18 +40,23 @@ class Bank(Structure):
         pass
 
 
-class BankQuery:
+class TikuQuery:
     def __init__(self):
         self.dataKu = cfg.get('api', 'datajson')
 
-    def post(self, item, dataFile=None):
+    def post(self, contentstr, dataFile=None):
         if not dataFile:
             dataFile = self.dataKu
         # if "" == item["content"]:
         #     logger.debug(f'content is empty')
         with open(dataFile, 'r', encoding='utf8') as f:
             dataKu = json.load(f)
-        print(dataKu)
+        for dataKuItem in dataKu:
+            if dataKuItem['content'] == contentstr:
+                print(dataKuItem['answer'])
+                return dataKuItem['answer']
+            else:
+                continue
 
     def put(self, item, url=None):
         if not url:

@@ -25,6 +25,7 @@ from selenium.webdriver.common.by import By
 from xuexi.unit import Timer, logger, caps, rules, cfg
 from xuexi.model import BankQuery
 from xuexi.secureRandom import SecureRandom as random
+from xuexi.model_local import TikuQuery
 
 
 class Automation:
@@ -146,6 +147,7 @@ class App(Automation):
         self.query = BankQuery()
         self.bank = None
         self.score = defaultdict(tuple)
+        self.query_local = TikuQuery()
 
         super().__init__()
 
@@ -338,6 +340,78 @@ class App(Automation):
             else:
                 logger.debug("题目类型非法")
 
+    def _verify_tiaozhan(self, category, content, options):
+        # 职责: 检索题库 查看提示
+        letters = list("ABCDEFGHIJKLMN")
+        self.bank = self.query.post({
+            "category": category,
+            "content": content,
+            "options": options
+        })
+        answer = self.query_local.post(content)
+        logger.info(f'本地搜索答案如下: {answer}')
+        if answer is not None:
+            logger.info(f'已知的正确答案: {answer}')
+            return answer
+        # excludes = self.bank["excludes"] if self.bank else ""
+        tips = self._view_tips()
+        if not tips:
+            logger.debug("本题没有提示")
+            if "填空题" == category:
+                return None
+            elif "多选题" == category:
+                return "ABCDEFG"[:len(options)]
+            elif "单选题" == category:
+                return self._search(content, options, excludes)
+            elif "挑战题" == category:
+                return self._search(content, options, excludes)
+            else:
+                logger.debug("题目类型非法")
+        else:
+            if "填空题" == category:
+                dest = re.findall(r'.{0,2}\s+.{0,2}', content)
+                logger.debug(f'dest: {dest}')
+                if 1 == len(dest):
+                    dest = dest[0]
+                    logger.debug(f'单处填空题可以尝试正则匹配')
+                    pattern = re.sub(r'\s+', '(.+?)', dest)
+                    logger.debug(f'匹配模式 {pattern}')
+                    res = re.findall(pattern, tips)
+                    if 1 == len(res):
+                        return res[0]
+                logger.debug(f'多处填空题难以预料结果，索性不处理')
+                return None
+
+            elif "多选题" == category:
+                check_res = [letter for letter, option in zip(letters, options) if (option in tips and len(option) > 0)]
+                if len(check_res) > 1:
+                    logger.debug(f'根据提示，可选项有: {check_res}')
+                    return "".join(check_res)
+                return "ABCDEFG"[:len(options)]
+            elif "单选题" == category:
+                radio_in_tips, radio_out_tips = "", ""
+                for letter, option in zip(letters, options):
+                    if len(option) > 0:
+                        if option in tips:
+                            logger.debug(f'{option} in tips')
+                            logger.debug(f'{len(option)}')
+                            radio_in_tips += letter
+                        else:
+                            logger.debug(f'{option} out tips')
+                            logger.debug(f'{len(option)}')
+                            radio_out_tips += letter
+
+                logger.debug(f'含 {radio_in_tips} 不含 {radio_out_tips}')
+                if 1 == len(radio_in_tips) and radio_in_tips not in excludes:
+                    logger.debug(f'根据提示 {radio_in_tips}')
+                    return radio_in_tips
+                if 1 == len(radio_out_tips) and radio_out_tips not in excludes:
+                    logger.debug(f'根据提示 {radio_out_tips}')
+                    return radio_out_tips
+                return self._search(content, options, excludes)
+            else:
+                logger.debug("题目类型非法")
+
     def _update_bank(self, item):
         return  # 关闭更新功能，看到这里的朋友不要乱改哦，因为API已经拒绝了更新请求，改了也没用
         if not self.bank or not self.bank["answer"]:
@@ -368,6 +442,10 @@ class App(Automation):
         while num > -1:
             content = self.wait.until(EC.presence_of_element_located(
                 (By.XPATH, rules['challenge_content']))).get_attribute("name")
+            # content = content.encode(encoding='UTF-8')
+            content = re.sub("\"", "", content)
+            content = content.replace(" ", "")
+            logger.info(content)
             # content = self.find_element(rules["challenge_content"]).get_attribute("name")
             option_elements = self.wait.until(EC.presence_of_all_elements_located(
                 (By.XPATH, rules['challenge_options'])))
@@ -376,7 +454,7 @@ class App(Automation):
             length_of_options = len(options)
             logger.info(f'<{num}> {content}')
             # 此处题目类型为”单选题“，不应该是挑战题，目前所有挑战题都是单选题。
-            answer = self._verify(category='挑战题', content=content, options=options)
+            answer = self._verify_tiaozhan(category='挑战题', content=content, options=options)
             delay_time = random.randint(self.challenge_delay_bot, self.challenge_delay_top)
             if 0 == num:
                 offset = random.randint(1, length_of_options - 1)  # randint居然包含上限值，坑爹！！！
@@ -440,9 +518,9 @@ class App(Automation):
                 continue
 
     def challenge(self):
-        if 0 == self.challenge_count:
-            logger.info(f'挑战答题积分已达成，无需重复挑战')
-            return
+        # if 0 == self.challenge_count:
+        #     logger.info(f'挑战答题积分已达成，无需重复挑战')
+        #     return
         self.safe_click(rules['mine_entry'])
         self.safe_click(rules['quiz_entry'])
         time.sleep(3)
@@ -1031,7 +1109,7 @@ class App(Automation):
                 #     cfg.getint('prefers', 'video_count_max'))
                 # self.view_delay = self.view_time // self.video_count + 1
                 self.video_count = t - g
-                self.view_delay = 120
+                self.view_delay = 30
         logger.debug(f'视听学习: {self.video_count}')
 
     def music(self):

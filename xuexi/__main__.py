@@ -15,7 +15,7 @@ from . import App
 from .unit import logger, caps
 from .secureRandom import SecureRandom as random
 import sys
-
+from xuexi.updateTiku import Tiku
 
 # parse = ArgumentParser(description="Accept username and password if necessary!")
 #
@@ -65,8 +65,10 @@ def test():
 
 
 if __name__ == "__main__":
+    # xuexitiaozhan = Tiku()
+    # xuexitiaozhan.get_tiku()
     user_list = [
-        # ['17660082669', 'Nopass.123'],
+        ['17660082669', 'Nopass.123'],
         ['18605315732', '000000'],
         ['17753166732', '000000'],
     ]
