@@ -57,13 +57,14 @@ class TikuQuery:
             ratioscore = fuzz.ratio(dataKuItem['content'], contentstr)
             if ratioscore > 60:
                 # logger.info(dataKuItem['content'] + "  比较  " + contentstr + "得分：")
-                logger.info("匹配都题目，得分：" + ratioscore)
+                logger.info(f"匹配到题目，得分：{ratioscore}")
                 if options == dataKuItem['options']:
                     return dataKuItem['answer']
                 elif fuzz.ratio(options, dataKuItem['options']) > 60:
                     return dataKuItem['answer']
                 else:
-                    logger.info("没有找到匹配答案:"+options)
+                    logger.info("没有找到匹配答案:")
+                    logger.info(options)
                     logger.info("题库答案是："+dataKuItem['options'])
             else:
                 continue

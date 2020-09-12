@@ -533,7 +533,7 @@ class App(Automation):
     # class Daily(App):
     def _daily_init(self):
         # super().__init__()
-        self.g, self.t = 0, 2
+        self.g, self.t = 0, 6
         self.count_of_each_group = cfg.getint('prefers', 'daily_count_each_group')
         try:
             self.g, self.t = self.score["每日答题"]
@@ -801,7 +801,7 @@ class App(Automation):
                 except:
                     raise TypeError('integer required')
                 self.g += score
-                if self.g == self.t:
+                if self.g >= self.t:
                     logger.info(f"今日答题已完成，返回")
                     break
             if num == 0:
