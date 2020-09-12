@@ -348,12 +348,12 @@ class App(Automation):
             "content": content,
             "options": options
         })
-        answer = self.query_local.post(content)
+        answer = self.query_local.post(content, options)
         logger.info(f'本地搜索答案如下: {answer}')
         if answer is not None:
             logger.info(f'已知的正确答案: {answer}')
             return answer
-        # excludes = self.bank["excludes"] if self.bank else ""
+        excludes = self.bank["excludes"] if self.bank else ""
         tips = self._view_tips()
         if not tips:
             logger.debug("本题没有提示")
@@ -442,10 +442,11 @@ class App(Automation):
         while num > -1:
             content = self.wait.until(EC.presence_of_element_located(
                 (By.XPATH, rules['challenge_content']))).get_attribute("name")
-            # content = content.encode(encoding='UTF-8')
-            content = re.sub("\"", "", content)
-            content = content.replace(" ", "")
-            logger.info(content)
+            # content = content.decode(encoding='UTF-8')
+            # content = re.sub("\"", "", content)
+            content = content.replace("\x20", " ")
+            content = content.replace("\xa0", " ")
+            # logger.info(content)
             # content = self.find_element(rules["challenge_content"]).get_attribute("name")
             option_elements = self.wait.until(EC.presence_of_all_elements_located(
                 (By.XPATH, rules['challenge_options'])))
@@ -518,9 +519,9 @@ class App(Automation):
                 continue
 
     def challenge(self):
-        # if 0 == self.challenge_count:
-        #     logger.info(f'挑战答题积分已达成，无需重复挑战')
-        #     return
+        if 0 == self.challenge_count:
+            logger.info(f'挑战答题积分已达成，无需重复挑战')
+            return
         self.safe_click(rules['mine_entry'])
         self.safe_click(rules['quiz_entry'])
         time.sleep(3)

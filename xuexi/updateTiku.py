@@ -81,10 +81,10 @@ class Tiku:
             pattern = re.compile('^[1-9]\\d*、')
             if pattern.search(tag.contents[0]) is not None:
                 # 插入题目
-                re.sub("\"", " ", item_tiku['content'])
-                item_tiku['content'] = pattern.sub("", tag.contents[0].replace("_", ""))  # 替换掉标题和下划线
+                # re.sub("\"", " ", item_tiku['content'])
+                item_tiku['content'] = pattern.sub("", tag.contents[0].replace("_", "  "))  # 替换掉标题和下划线
                 item_tiku['content'] = re.sub("\"", "", item_tiku['content'])
-                item_tiku['content'] = re.sub("（ ）", "", item_tiku['content'])
+                item_tiku['content'] = re.sub("（ ）", "        ", item_tiku['content'])
                 # print(item_tiku['content'] )
                 answeroptions = []
             # 判断adcd选项

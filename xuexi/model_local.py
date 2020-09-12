@@ -4,6 +4,7 @@
 import json
 import requests
 from xuexi.unit import cfg, logger
+from fuzzywuzzy import fuzz
 
 
 class Structure:
@@ -44,7 +45,7 @@ class TikuQuery:
     def __init__(self):
         self.dataKu = cfg.get('api', 'datajson')
 
-    def post(self, contentstr, dataFile=None):
+    def post(self, contentstr, options, dataFile=None):
         if not dataFile:
             dataFile = self.dataKu
         # if "" == item["content"]:
@@ -52,9 +53,18 @@ class TikuQuery:
         with open(dataFile, 'r', encoding='utf8') as f:
             dataKu = json.load(f)
         for dataKuItem in dataKu:
-            if dataKuItem['content'] == contentstr:
-                print(dataKuItem['answer'])
-                return dataKuItem['answer']
+            # if dataKuItem['content'] == contentstr:
+            ratioscore = fuzz.ratio(dataKuItem['content'], contentstr)
+            if ratioscore > 60:
+                # logger.info(dataKuItem['content'] + "  比较  " + contentstr + "得分：")
+                logger.info("匹配都题目，得分：" + ratioscore)
+                if options == dataKuItem['options']:
+                    return dataKuItem['answer']
+                elif fuzz.ratio(options, dataKuItem['options']) > 60:
+                    return dataKuItem['answer']
+                else:
+                    logger.info("没有找到匹配答案:"+options)
+                    logger.info("题库答案是："+dataKuItem['options'])
             else:
                 continue
 
