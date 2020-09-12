@@ -540,7 +540,7 @@ class App(Automation):
             self.daily_count = self.t - self.g
             if self.daily_count > 0:
                 self.daily_count = cfg.getint('prefers', 'daily_count')
-            self.daily_force = self.daily_count > 0
+            self.daily_force = False
         except:
             self.g, self.t = self.score["每日答题"]
             self.daily_count = self.t - self.g

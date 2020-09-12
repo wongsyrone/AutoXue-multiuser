@@ -65,7 +65,10 @@ class TikuQuery:
                 else:
                     logger.info("没有找到匹配答案:")
                     logger.info(options)
-                    logger.info("题库答案是："+dataKuItem['options'])
+                    logger.info("题库答案是：")
+                    logger.info(dataKuItem['options'])
+                    logger.info("匹配分数为：")
+                    logger.info(fuzz.ratio(options, dataKuItem['options']))
             else:
                 continue
 
