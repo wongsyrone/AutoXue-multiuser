@@ -1032,28 +1032,8 @@ class App(Automation):
 
     def read(self):
         logger.info(f"阅读 {self.read_count} 篇文章")
-        if 0 == self.read_count:
-            g, t = self.score["本地频道"]
-            if t == g:
-                logger.info(f'本地频道已达成，跳过')
-            else:
-                self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
-                self._kaleidoscope()
-            g, t = self.score["发表观点"]
-            if t == g:
-                logger.info(f'新闻阅读订阅均已达成，跳过')
-                return
-            else:
-                self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
-                logger.info(f'新闻阅读已达成，无需重复阅读,只评论转发')
-                self._comment_only(self.star_share_comments_count)
-            return
-        logger.debug(f'正在进行新闻学习...')
-        # self.safe_back('mine -> home')
-        # self._kaleidoscope()
-        self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
-        self._kaleidoscope()
         # 找指定的新闻阅读频道
+        self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
         vol_not_found = True
         while vol_not_found:
             # 顶多右划4次，找不到就返回
@@ -1083,6 +1063,27 @@ class App(Automation):
                     right_slide = right_slide - 1
             else:
                 self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
+        if 0 == self.read_count:
+            g, t = self.score["本地频道"]
+            if t == g:
+                logger.info(f'本地频道已达成，跳过')
+            else:
+                self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
+                self._kaleidoscope()
+            g, t = self.score["发表观点"]
+            if t == g:
+                logger.info(f'新闻阅读订阅均已达成，跳过')
+                return
+            else:
+                self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
+                logger.info(f'新闻阅读已达成，无需重复阅读,只评论转发')
+                self._comment_only(self.star_share_comments_count)
+            return
+        logger.debug(f'正在进行新闻学习...')
+        # self.safe_back('mine -> home')
+        # self._kaleidoscope()
+        self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
+        self._kaleidoscope()
 
         self._read(self.read_count, self.star_share_comments_count)
 
