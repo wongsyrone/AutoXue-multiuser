@@ -982,17 +982,6 @@ class App(Automation):
                 article_delay = 10
                 logger.info(f'阅读时间估计 {article_delay} 秒...')
                 time.sleep(5)
-                # while article_delay > 0:
-                #     if article_delay < 20:
-                #         delay = article_delay
-                #     else:
-                #         delay = random.randint(min(10, article_delay), min(20, article_delay))
-                #     logger.debug(f'延时 {delay} 秒...')
-                #     time.sleep(delay)
-                #     article_delay -= delay
-                #     self.swipe_up()
-                # else:
-                #     logger.debug(f'完成阅读 {title}')
                 ssc_count = ssc_count - 1
                 try:
                     comment_area = self.driver.find_element_by_xpath(rules['article_comments'])
@@ -1029,6 +1018,7 @@ class App(Automation):
             logger.info(f"在本地学习平台驻足 {delay} 秒")
             time.sleep(delay)
             self.safe_back('学习平台 -> 文章列表')
+            time.sleep(2)
 
     def read(self):
         logger.info(f"阅读 {self.read_count} 篇文章")
@@ -1040,41 +1030,9 @@ class App(Automation):
             else:
                 self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
                 self._kaleidoscope()
-                # 找指定的新闻阅读频道
-                self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
-                vol_not_found = True
-                while vol_not_found:
-                    # 顶多右划4次，找不到就返回
-                    right_slide = 3
-                    while right_slide >= 0:
-                        try:
-                            volumns = self.wait.until(
-                                EC.presence_of_all_elements_located((By.XPATH, rules['article_volumn'])))
-                        # volumns = self.find_elements(rules['article_volumn'])
-                        except:
-                            self.safe_back('mine -> home')
-                            volumns = self.wait.until(
-                                EC.presence_of_all_elements_located((By.XPATH, rules['article_volumn'])))
-                        first_vol = volumns[1]
-                        for vol in volumns:
-                            title = vol.get_attribute("name")
-                            logger.debug(title)
-                            if self.volumn_title == title:
-                                vol.click()
-                                # 找到约定栏目，标记退出循环
-                                vol_not_found = False
-                                right_slide = -2
-                                break
-                        else:
-                            logger.debug(f'未找到 {self.volumn_title}，右划')
-                            # self.safe_click(rules['article_share'])
-                            # self.safe_back('mine -> home')
-                            self.driver.scroll(vol, first_vol, duration=500)
-                            right_slide = right_slide - 1
-                    else:
-                        self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
             g, t = self.score["发表观点"]
-            if t == g:
+            g1, t1 = self.score["分享"]
+            if t == g and g1 == t1:
                 logger.info(f'新闻阅读订阅均已达成，跳过')
                 return
             else:
