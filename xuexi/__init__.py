@@ -1108,6 +1108,7 @@ class App(Automation):
         # self._kaleidoscope()
         self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
         self._kaleidoscope()
+        self._get_article_vol()
         self._read(self.read_count, self.star_share_comments_count)
 
     # 视听学习模块
