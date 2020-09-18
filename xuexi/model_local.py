@@ -60,7 +60,7 @@ class TikuQuery:
                 logger.info(f"匹配到题目，得分：{ratioscore}")
                 if options == dataKuItem['options']:
                     return dataKuItem['answer']
-                elif fuzz.ratio(options, dataKuItem['options']) > 60:
+                elif fuzz.ratio(options, dataKuItem['options']) > 65:
                     return dataKuItem['answer']
                 else:
                     logger.info("没有找到匹配答案:")
