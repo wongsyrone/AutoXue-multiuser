@@ -225,7 +225,7 @@ class App(Automation):
         titles = ["登录", "我要选读文章", "视听学习", "视听学习时长", "每日答题", "每周答题", "专项答题",
                   "挑战答题", "订阅", "分享", "发表观点", "本地频道"]
         score_list = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['score_list'])))
-        time.sleep(5)
+        # time.sleep(5)
         # score_list = self.find_elements(rules["score_list"])
         for t, score in zip(titles, score_list):
             s = score.get_attribute("name")

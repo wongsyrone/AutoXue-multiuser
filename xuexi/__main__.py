@@ -12,7 +12,7 @@ import subprocess
 from argparse import ArgumentParser
 import time
 from . import App
-from .unit import logger, caps
+from .unit import logger, usernames
 from .secureRandom import SecureRandom as random
 import sys
 from xuexi.updateTiku import Tiku
@@ -54,12 +54,26 @@ def test():
 if __name__ == "__main__":
     # xuexitiaozhan = Tiku()
     # xuexitiaozhan.get_tiku()
-    user_list = [
-        # ['17660082669', 'Nopass.123'],
-        # ['18605315732', '000000'],
-        # ['17753166732', '000000'],
-    ]
-    for index_u, user in enumerate(user_list):
+
+    # 获取用户名列表
+    user_list = []
+    users_list = []
+    uservalue = True
+    for username in usernames.values():
+        # logger.info(username)
+        if uservalue:
+            user_list.append(username)
+            uservalue = False
+        else:
+            user_list.append(username)
+            users_list.append(user_list)
+            uservalue = True
+    # users_list = [
+    #     # ['17660082669', 'Nopass.123'],
+    #     # ['18605315732', '000000'],
+    #     # ['17753166732', '000000'],
+    # ]
+    for index_u, user in enumerate(users_list):
         # 定义一个APP的启动时间，超时1小时换下一个
         t = time.time()
         while True:

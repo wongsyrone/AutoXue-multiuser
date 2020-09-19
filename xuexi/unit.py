@@ -114,6 +114,7 @@ for key, value in caps.items():
 rules = dict(configs['rules'])
 logger = create_logger('xuexi', console_levelname=cfg.get("prefers", "console_levelname"))
 
+usernames = dict(configs['usernames'])
 
 if __name__ == "__main__":
     for k,v in caps.items():
