@@ -48,29 +48,16 @@ def test():
     logger.info(f'测试完毕')
 
 
-# 循环刷题
-# def recycle_main_do():
-#     t = time.time()
-#     while True:
-#         try:
-#             start()
-#             break
-#         except Exception as ex:
-#             print("出现如下异常%s" % ex)
-#             app.logout_or_not()
-#             app.driver.close_app()
-#             if time.time() - t > 3600:
-#                 print('程序存在错误，试了一个小时都不行，换下个号码刷')
-#                 break
+
 
 
 if __name__ == "__main__":
     # xuexitiaozhan = Tiku()
     # xuexitiaozhan.get_tiku()
     user_list = [
-        ['17660082669', 'Nopass.123'],
-        ['18605315732', '000000'],
-        ['17753166732', '000000'],
+        # ['17660082669', 'Nopass.123'],
+        # ['18605315732', '000000'],
+        # ['17753166732', '000000'],
     ]
     for index_u, user in enumerate(user_list):
         # 定义一个APP的启动时间，超时1小时换下一个
