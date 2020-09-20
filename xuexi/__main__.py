@@ -17,6 +17,7 @@ from .secureRandom import SecureRandom as random
 import sys
 from xuexi.updateTiku import Tiku
 
+
 # parse = ArgumentParser(description="Accept username and password if necessary!")
 #
 # parse.add_argument("-u", "--username", metavar="username", type=str, default='', help='User Name')
@@ -48,10 +49,8 @@ def test():
     logger.info(f'测试完毕')
 
 
-
-
-
 if __name__ == "__main__":
+    # 更新题库
     # xuexitiaozhan = Tiku()
     # xuexitiaozhan.get_tiku()
 
@@ -69,9 +68,9 @@ if __name__ == "__main__":
             users_list.append(user_list)
             uservalue = True
     # users_list = [
-    #     # ['17660082669', 'Nopass.123'],
-    #     # ['18605315732', '000000'],
-    #     # ['17753166732', '000000'],
+    #     ['17660082669', 'Nopass.123'],
+    #     ['18605315732', '000000'],
+    #     ['17753166732', '000000'],
     # ]
     for index_u, user in enumerate(users_list):
         # 定义一个APP的启动时间，超时1小时换下一个
