@@ -54,7 +54,7 @@ if __name__ == "__main__":
     # xuexitiaozhan = Tiku()
     # xuexitiaozhan.get_tiku()
 
-    获取用户名列表
+    # 获取用户名列表
     user_list = []
     users_list = []
     uservalue = True
