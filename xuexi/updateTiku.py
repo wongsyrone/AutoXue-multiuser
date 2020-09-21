@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 
 import json
 import requests
-from lxml import etree
 from bs4 import BeautifulSoup
 import re
 from xuexi.model_local import TikuQuery
