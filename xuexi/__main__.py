@@ -66,7 +66,11 @@ if __name__ == "__main__":
         else:
             user_list.append(username)
             users_list.append(user_list)
+            # print(user_list)
+            user_list = []
             uservalue = True
+    print("本次学习一下账号：")
+    print(users_list)
     # users_list = [
     #     ['17660082669', 'Nopass.123'],
     #     ['18605315732', '000000'],
