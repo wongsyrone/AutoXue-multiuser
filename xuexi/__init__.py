@@ -19,6 +19,7 @@ from itertools import accumulate
 from collections import defaultdict
 from appium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -1123,6 +1124,7 @@ class App(Automation):
         else:
             self.view_time = 360
         self.radio_chanel = cfg.get("prefers", "radio_chanel")
+        self.poem_chanel = cfg.get("prefers", "poem_chanel")
         try:
             self.video_count = cfg.getint("prefers", "video_count")
             self.view_delay = 15
@@ -1154,6 +1156,31 @@ class App(Automation):
                 return
             else:
                 self._music()
+
+    def poem(self):
+        if not self.video_count:
+            logger.info('视听学习积分已达成，无须读诗歌')
+            return
+        logger.info(f'正在打开《{self.poem_chanel}》...')
+        time.sleep(3)
+        self._poem()
+        time.sleep(1)
+        self.safe_back()
+        self.safe_back()
+        self.safe_back()
+        self.safe_back()
+
+    def _poem(self):
+        self.safe_click('//*[@resource-id="cn.xuexi.android:id/img_search_left"]')
+        edit_area = self.wait.until(
+            EC.presence_of_element_located((By.XPATH, '//*[@resource-id="android:id/search_src_text"]')))
+        # edit_area = self.find_element(rules['article_comments_edit'])
+        edit_area.send_keys("唐诗三百首")
+        self.driver.keyevent('66')
+        time.sleep(8)
+        self.safe_click('//android.view.View[@text="唐诗三百首·五言绝句"]')
+        time.sleep(3)
+        self.safe_click('//android.widget.TextView[@text="全部播放"]')
 
     def _music(self):
         logger.debug(f'正在打开《{self.radio_chanel}》...')

@@ -35,7 +35,7 @@ def shuffle(funcs):
 
 def start():
     logger.debug(f'视听学习置后')
-    app.music()
+    app.poem()
     shuffle([app.daily, app.challenge, app.read, app.weekly])
     app.view_score()
     app.watch()
@@ -45,11 +45,12 @@ def start():
 
 
 def test():
-    app.weekly()
+    app._poem()
     logger.info(f'测试完毕')
 
 
 if __name__ == "__main__":
+
     # 更新题库
     # xuexitiaozhan = Tiku()
     # xuexitiaozhan.get_tiku()
@@ -69,7 +70,7 @@ if __name__ == "__main__":
             # print(user_list)
             user_list = []
             uservalue = True
-    print("本次学习一下账号：")
+    print("本次学习以下账号：")
     print(users_list)
     # users_list = [
     #     ['17660082669', 'Nopass.123'],
@@ -82,6 +83,9 @@ if __name__ == "__main__":
         while True:
             try:
                 app = App(user[0], user[1])
+                # time.sleep(3)
+                # test()
+                # time.sleep(600)
                 start()
                 break
             except Exception as ex:
