@@ -35,7 +35,8 @@ def shuffle(funcs):
 
 def start():
     logger.debug(f'视听学习置后')
-    app.poem()
+    app.music()
+    # app.poem()
     shuffle([app.daily, app.challenge, app.read, app.weekly])
     app.view_score()
     app.watch()
