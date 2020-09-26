@@ -42,7 +42,8 @@ def start():
     app.watch()
     app.logout_or_not()
     app.driver.close_app()
-    # app.driver.quit()
+    app.driver.session.clear()
+    app.driver.quit()
 
 
 def test():
@@ -93,9 +94,12 @@ if __name__ == "__main__":
                 logger.info(f'刷分出现如下异常    %s' % ex)
                 try:
                     app.logout_or_not()
-                    app.driver.close_app()
+                    # app.driver.close_app()
+                    app.driver.session.clear()
+                    app.driver.quit()
                 except Exception as ex:
                     logger.info(f'退出APP出现如下异常    %s' % ex)
+
                 if time.time() - t > 3600:
                     print('程序存在错误，试了一个小时都不行，换下个号码刷')
                     logger.info(f'程序存在错误，试了一个小时都不行，换下个号码刷')

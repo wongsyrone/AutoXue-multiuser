@@ -200,7 +200,9 @@ class App(Automation):
         password.send_keys(self.password)
         self.safe_click(rules["login_submit"])
         logger.info(f'开始学习{self.username}的账号')
-        time.sleep(15)
+        # time.sleep(15)
+        self.wait.until(EC.presence_of_element_located((
+            By.XPATH, rules["home_entry"])))
         try:
             home = self.driver.find_element_by_xpath(rules["home_entry"])
             logger.debug(f'无需点击同意条款按钮')
@@ -209,7 +211,7 @@ class App(Automation):
             logger.debug(self.driver.current_activity)
             logger.debug(f"需要点击同意条款按钮")
             self.safe_click(rules["login_confirm"])
-        time.sleep(3)
+        # time.sleep(3)
 
     def logout_or_not(self):
         if cfg.getboolean("prefers", "keep_alive"):
@@ -226,6 +228,7 @@ class App(Automation):
         titles = ["登录", "我要选读文章", "视听学习", "视听学习时长", "每日答题", "每周答题", "专项答题",
                   "挑战答题", "订阅", "分享", "发表观点", "本地频道"]
         time.sleep(5)
+        # self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '')))
         score_list = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['score_list'])))
 
         # score_list = self.find_elements(rules["score_list"])
@@ -234,9 +237,12 @@ class App(Automation):
             self.score[t] = tuple([int(x) for x in re.findall(r'\d+', s)])
 
         # print(self.score)
+        totalscore = 0
         for i in self.score:
             # logger.debug(f'{i}, {self.score[i]}')
             logger.info(f'{i}, {self.score[i]}')
+            totalscore += self.score[i][0]
+        logger.info(f'今日总得分：    {totalscore}')
         self.safe_back('score -> home')
 
     def back_or_not(self, title):
