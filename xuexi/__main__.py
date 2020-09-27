@@ -41,9 +41,9 @@ def start():
     app.view_score()
     app.watch()
     app.logout_or_not()
-    app.driver.close_app()
-    app.driver.session.clear()
-    app.driver.quit()
+    # app.driver.close_app()
+    # app.driver.session.clear()
+    # app.driver.quit()
 
 
 def test():
@@ -79,12 +79,13 @@ if __name__ == "__main__":
     #     ['18605315732', '000000'],
     #     ['17753166732', '000000'],
     # ]
+    app = App()
     for index_u, user in enumerate(users_list):
         # 定义一个APP的启动时间，超时1小时换下一个
         t = time.time()
         while True:
             try:
-                app = App(user[0], user[1])
+                app.initapp(user[0], user[1])
                 # time.sleep(3)
                 # test()
                 # time.sleep(600)
@@ -95,8 +96,8 @@ if __name__ == "__main__":
                 try:
                     app.logout_or_not()
                     # app.driver.close_app()
-                    app.driver.session.clear()
-                    app.driver.quit()
+                    # app.driver.session.clear()
+                    # app.driver.quit()
                 except Exception as ex:
                     logger.info(f'退出APP出现如下异常    %s' % ex)
 

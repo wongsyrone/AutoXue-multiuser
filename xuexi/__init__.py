@@ -152,8 +152,19 @@ class App(Automation):
 
         super().__init__()
 
-        self.login_or_not()
+        # self.login_or_not()
         self.driver.wait_activity('com.alibaba.android.rimet.biz.home.activity.HomeActivity', 20, 3)
+        # self.view_score()
+        # self._read_init()
+        # self._view_init()
+        # self._daily_init()
+        # self._challenge_init()
+        # self._weekly_init()
+
+    def initapp(self, username="", password=""):
+        self.username = username
+        self.password = password
+        self.login_or_not()
         self.view_score()
         self._read_init()
         self._view_init()
@@ -163,7 +174,7 @@ class App(Automation):
 
     def login_or_not(self):
         # com.alibaba.android.user.login.SignUpWithPwdActivity
-        time.sleep(30)  # 首屏等待时间
+        time.sleep(10)  # 首屏等待时间
         try:
             home = self.driver.find_element_by_xpath(rules["mine_entry"])
             # home = self.driver.find_element_by_xpath(rules["mine_entry"])
@@ -227,7 +238,7 @@ class App(Automation):
         self.safe_click(rules['score_entry'])
         titles = ["登录", "我要选读文章", "视听学习", "视听学习时长", "每日答题", "每周答题", "专项答题",
                   "挑战答题", "订阅", "分享", "发表观点", "本地频道"]
-        time.sleep(5)
+        time.sleep(9)
         # self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '')))
         score_list = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['score_list'])))
 
@@ -859,7 +870,7 @@ class App(Automation):
             self.read_count = 0
             self.read_delay = random.randint(45, 60)
         else:
-            self.read_count = t - g
+            self.read_count = (t - g)//2 + 1
             # self.read_count = random.randint(
             #     cfg.getint('prefers', 'article_count_min'),
             #     cfg.getint('prefers', 'article_count_max'))
@@ -941,7 +952,7 @@ class App(Automation):
                 article.click()
                 num -= 1
                 logger.info(f'<{num}> 当前篇目 {title}')
-                article_delay = random.randint(30, 30 + min(10, self.read_count))
+                article_delay = random.randint(60, 60 + min(10, self.read_count))
                 logger.info(f'阅读时间估计 {article_delay} 秒...')
                 while article_delay > 0:
                     if article_delay < 20:
