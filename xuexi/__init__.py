@@ -245,8 +245,8 @@ class App(Automation):
         self.safe_click(rules['score_entry'])
         titles = ["登录", "我要选读文章", "视听学习", "视听学习时长", "每日答题", "每周答题", "专项答题",
                   "挑战答题", "争上游答题", "双人对战", "订阅", "分享", "发表观点", "本地频道"]
-        time.sleep(15)
-        # self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '')))
+        # time.sleep(15)
+        self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@text="本地频道"]')))
         score_list = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['score_list'])))
 
         # score_list = self.find_elements(rules["score_list"])
@@ -380,7 +380,7 @@ class App(Automation):
         if answer is not None:
             logger.info(f'已知的正确答案: {answer}')
             return answer
-        # excludes = self.bank["excludes"] if self.bank else ""
+        excludes = self.bank["excludes"] if self.bank else ""
         tips = self._view_tips()
         if not tips:
             logger.debug("本题没有提示")
@@ -565,18 +565,21 @@ class App(Automation):
             try:
                 option_elements[ord(answer) - 65].click()
             except:
-                time.sleep(4)
-                zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                # time.sleep(1)
+                self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
+                # zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
                 logger.info(f'本轮挑战结束,居然tm输给了别人！！！')
                 break
             try:
-                time.sleep(4)
-                zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                time.sleep(1)
+                self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
+                # zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
                 logger.info(f'本轮挑战结束')
-                time.sleep(5)
+                time.sleep(2)
                 break
             except:
-                logger.debug(f'本题回答完毕，正不正确不知道， 继续下一题')
+                logger.debug(f'本题回答完毕，管他对不对，抓紧继续下一题')
+                time.sleep(2)
                 num += 1
         else:
             logger.debug("通过选项偏移，应该不会打印这句话，除非碰巧答案有误")
@@ -610,7 +613,7 @@ class App(Automation):
             while cyclenum > 0:
                 result = self._zhengshangyou_cycle()
                 delay_time = random.randint(5, 10)
-                logger.info(f'本次挑战 {result} 题，{delay_time} 秒后再来一组')
+                logger.info(f'本次争上游作对 {result} 题')
                 time.sleep(delay_time)
                 cyclenum -= 1
                 self.safe_back()
