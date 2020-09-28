@@ -37,7 +37,7 @@ def start():
     logger.debug(f'视听学习置后')
     app.music()
     # app.poem()
-    shuffle([app.daily, app.challenge, app.zhengshangyou, app.read, app.weekly])
+    shuffle([app.daily, app.challenge,app.read, app.weekly])
     app.view_score()
     app.watch()
     app.logout_or_not()
@@ -53,32 +53,32 @@ def test():
 
 if __name__ == "__main__":
 
-    # 更新题库
-    # xuexitiaozhan = Tiku()
-    # xuexitiaozhan.get_tiku()
+    更新题库
+    xuexitiaozhan = Tiku()
+    xuexitiaozhan.get_tiku()
 
-    # 获取用户名列表
-    # user_list = []
-    # users_list = []
-    # uservalue = True
-    # for username in usernames.values():
-    #     # logger.info(username)
-    #     if uservalue:
-    #         user_list.append(username)
-    #         uservalue = False
-    #     else:
-    #         user_list.append(username)
-    #         users_list.append(user_list)
-    #         # print(user_list)
-    #         user_list = []
-    #         uservalue = True
-    # print("本次学习以下账号：")
-    # print(users_list)
-    users_list = [
-        # ['17660082669', 'Nopass.123'],
-        # ['18605315732', '000000'],
-        ['17753166732', '000000'],
-    ]
+    获取用户名列表
+    user_list = []
+    users_list = []
+    uservalue = True
+    for username in usernames.values():
+        # logger.info(username)
+        if uservalue:
+            user_list.append(username)
+            uservalue = False
+        else:
+            user_list.append(username)
+            users_list.append(user_list)
+            # print(user_list)
+            user_list = []
+            uservalue = True
+    print("本次学习以下账号：")
+    print(users_list)
+    # users_list = [
+    #     # ['17660082669', 'Nopass.123'],
+    #     # ['18605315732', '000000'],
+    #     ['17753166732', '000000'],
+    # ]
     app = App()
     for index_u, user in enumerate(users_list):
         # 定义一个APP的启动时间，超时1小时换下一个
@@ -98,6 +98,7 @@ if __name__ == "__main__":
                     # app.driver.quit()
                 except Exception as ex:
                     logger.info(f'退出APP出现如下异常    %s' % ex)
+                    app.safe_back()
 
                 if time.time() - t > 3600:
                     print('程序存在错误，试了一个小时都不行，换下个号码刷')
