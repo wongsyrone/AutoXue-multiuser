@@ -5,7 +5,7 @@ import json
 import requests
 from xuexi.unit import cfg, logger
 from fuzzywuzzy import fuzz
-
+from fuzzywuzzy import process
 
 class Structure:
     _fields = []
@@ -44,15 +44,18 @@ class Bank(Structure):
 class TikuQuery:
     def __init__(self):
         self.dataKu = cfg.get('api', 'datajson')
+        with open(self.dataKu, 'r', encoding='utf8') as f:
+            self.dataKu = json.load(f)
 
-    def post(self, contentstr, options, dataFile=None):
-        if not dataFile:
-            dataFile = self.dataKu
-        # if "" == item["content"]:
-        #     logger.debug(f'content is empty')
-        with open(dataFile, 'r', encoding='utf8') as f:
-            dataKu = json.load(f)
-        for dataKuItem in dataKu:
+    def post(self, contentstr, options):
+        # if not dataFile:
+        #     dataFile = self.dataKu
+        # # if "" == item["content"]:
+        # #     logger.debug(f'content is empty')
+        # with open(dataFile, 'r', encoding='utf8') as f:
+        #     dataKu = json.load(f)
+        logger.info("开始比较题库")
+        for dataKuItem in self.dataKu:
             # if dataKuItem['content'] == contentstr:
             ratioscore = fuzz.ratio(dataKuItem['content'], contentstr)
             if ratioscore > 60:

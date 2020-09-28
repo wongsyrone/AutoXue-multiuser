@@ -171,6 +171,7 @@ class App(Automation):
         self._daily_init()
         self._challenge_init()
         self._weekly_init()
+        self._zhengshangyou_init()
 
     def login_or_not(self):
         # com.alibaba.android.user.login.SignUpWithPwdActivity
@@ -369,17 +370,17 @@ class App(Automation):
     def _verify_tiaozhan(self, category, content, options):
         # 职责: 检索题库 查看提示
         letters = list("ABCDEFGHIJKLMN")
-        self.bank = self.query.post({
-            "category": category,
-            "content": content,
-            "options": options
-        })
+        # self.bank = self.query.post({
+        #     "category": category,
+        #     "content": content,
+        #     "options": options
+        # })
         answer = self.query_local.post(content, options)
         logger.info(f'本地搜索答案如下: {answer}')
         if answer is not None:
             logger.info(f'已知的正确答案: {answer}')
             return answer
-        excludes = self.bank["excludes"] if self.bank else ""
+        # excludes = self.bank["excludes"] if self.bank else ""
         tips = self._view_tips()
         if not tips:
             logger.debug("本题没有提示")
@@ -388,9 +389,9 @@ class App(Automation):
             elif "多选题" == category:
                 return "ABCDEFG"[:len(options)]
             elif "单选题" == category:
-                return self._search(content, options, excludes)
+                return self._search(content, options)
             elif "挑战题" == category:
-                return self._search(content, options, excludes)
+                return self._search(content, options)
             else:
                 logger.debug("题目类型非法")
         else:
@@ -442,6 +443,16 @@ class App(Automation):
         return  # 关闭更新功能，看到这里的朋友不要乱改哦，因为API已经拒绝了更新请求，改了也没用
         if not self.bank or not self.bank["answer"]:
             self.query.put(item)
+
+    # 争上游模块初始化
+    def _zhengshangyou_init(self):
+        g, t = self.score["争上游答题"]
+        if t == g:
+            self.zhengshangyou_count = 0
+        elif g > 0:
+            self.zhengshangyou_count = 1
+        else:
+            self.zhengshangyou_count = 2
 
     # 挑战答题模块
     # class Challenge(App):
@@ -531,6 +542,51 @@ class App(Automation):
         self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
         return num
 
+    def _zhengshangyou_cycle(self):
+        self.safe_click(rules['zhengshangyou_entry'])
+        num = 1
+        self.wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//*[@text="开始比赛"]')))
+        self.safe_click('//*[@text="开始比赛"]')
+        while True:
+            content = self.wait.until(EC.presence_of_element_located(
+                (By.XPATH, rules['challenge_content']))).get_attribute("name")
+            content = content.replace("\x20", " ")
+            content = content.replace("\xa0", " ")
+            content = content[3:]
+            option_elements = self.wait.until(EC.presence_of_all_elements_located(
+                (By.XPATH, rules['challenge_options'])))
+            options = [x.get_attribute("name") for x in option_elements]
+            logger.info(f'<{num}> {content}')
+            # 此处题目类型为”单选题“，不应该是挑战题，目前所有挑战题都是单选题。
+            answer = self._verify_tiaozhan(category='挑战题', content=content, options=options)
+            delay_time = 0
+            logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
+            try:
+                option_elements[ord(answer) - 65].click()
+            except:
+                time.sleep(4)
+                zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                logger.info(f'本轮挑战结束,居然tm输给了别人！！！')
+                break
+            try:
+                time.sleep(4)
+                zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                logger.info(f'本轮挑战结束')
+                time.sleep(5)
+                break
+            except:
+                logger.debug(f'本题回答完毕，正不正确不知道， 继续下一题')
+                num += 1
+        else:
+            logger.debug("通过选项偏移，应该不会打印这句话，除非碰巧答案有误")
+            logger.debug("那么也好，延时30秒后结束挑战")
+            time.sleep(30)
+            self.safe_back('challenge -> share_page')  # 发现部分模拟器返回无效
+        # 更新后挑战答题需要增加一次返回
+        self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
+        return num
+
     def _challenge(self):
         logger.info(f'挑战答题 目标 {self.challenge_count} 题, Go!')
         while True:
@@ -544,6 +600,22 @@ class App(Automation):
                 time.sleep(delay_time)
                 continue
 
+    def _zhengshangyou(self):
+        cyclenum = self.zhengshangyou_count
+        if cyclenum == 0:
+            logger.info(f'争上游已经得到满分，跳过 ')
+            return
+        else:
+            logger.info(f'争上游走{cyclenum}波！ ')
+            while cyclenum > 0:
+                result = self._zhengshangyou_cycle()
+                delay_time = random.randint(5, 10)
+                logger.info(f'本次挑战 {result} 题，{delay_time} 秒后再来一组')
+                time.sleep(delay_time)
+                cyclenum -= 1
+                self.safe_back()
+                continue
+
     def challenge(self):
         if 0 == self.challenge_count:
             logger.info(f'挑战答题积分已达成，无需重复挑战')
@@ -552,6 +624,14 @@ class App(Automation):
         self.safe_click(rules['quiz_entry'])
         time.sleep(3)
         self._challenge()
+        self.safe_back('quiz -> mine')
+        self.safe_back('mine -> home')
+
+    def zhengshangyou(self):
+        self.safe_click(rules['mine_entry'])
+        self.safe_click(rules['quiz_entry'])
+        time.sleep(3)
+        self._zhengshangyou()
         self.safe_back('quiz -> mine')
         self.safe_back('mine -> home')
 
@@ -876,7 +956,7 @@ class App(Automation):
             self.read_count = 0
             self.read_delay = random.randint(45, 60)
         else:
-            self.read_count = (t - g)//2 + 1
+            self.read_count = (t - g) // 2 + 1
             # self.read_count = random.randint(
             #     cfg.getint('prefers', 'article_count_min'),
             #     cfg.getint('prefers', 'article_count_max'))
