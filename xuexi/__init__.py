@@ -40,7 +40,7 @@ class Automation:
             "unicodeKeyboard": caps["unicodekeyboard"],
             "resetKeyboard": caps["resetkeyboard"],
             "noReset": caps["noreset"],
-            'newCommandTimeout': 800,
+            'newCommandTimeout': 8000,
             "deviceName": caps["devicename"],
             "uuid": caps["uuid"],
             "appPackage": caps["apppackage"],
@@ -188,6 +188,12 @@ class App(Automation):
             is_login = False
             logger.debug(f"非首页，先进行登录")
             logger.info("app未登录")
+            try:
+                self.driver.find_element_by_xpath(rules["login_username"])
+            except:
+                logger.info("app出错，返回上一层！")
+                self.safe_back()
+
         if is_login:
             self.safe_click(rules["mine_entry"])
             self.safe_click(rules["setting_submit"])
@@ -237,8 +243,8 @@ class App(Automation):
     def view_score(self):
         self.safe_click(rules['score_entry'])
         titles = ["登录", "我要选读文章", "视听学习", "视听学习时长", "每日答题", "每周答题", "专项答题",
-                  "挑战答题", "订阅", "分享", "发表观点", "本地频道"]
-        time.sleep(9)
+                  "挑战答题", "争上游答题", "双人对战", "订阅", "分享", "发表观点", "本地频道"]
+        time.sleep(15)
         # self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '')))
         score_list = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['score_list'])))
 
