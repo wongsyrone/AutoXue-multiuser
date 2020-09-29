@@ -105,7 +105,7 @@ if __name__ == "__main__":
                         cancel.click()
                     except:
                         logger.info("莫名其妙错误！很有可能app退出了！重新启动")
-                        app.safe_back()
+                        # app.safe_back()
                         app.driver.activate_app()
 
                 if time.time() - t > 3600:
