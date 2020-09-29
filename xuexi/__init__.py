@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-@project: AutoXue
-@file: __init__.py
-@author: kessil
-@contact: https://github.com/kessil/AutoXue/
-@time: 2019-10-26(星期六) 09:03
-@Copyright © 2019. All rights reserved.
+@project: AutoXue-multiuser
+@file: __main__.py
+@time: 2020年9月29日10:55:28
+@Copyright © 2020. All rights reserved.
 """
 import re
 import time

@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-@project: AutoXue
-@file: unit.py
-@author: kessil
-@contact: https://github.com/kessil/AutoXue/
-@time: 2019-10-25(星期五) 21:44
-@Copyright © 2019. All rights reserved.
+@project: AutoXue-multiuser
+@file: __main__.py
+@time: 2020年9月29日10:55:28
+@Copyright © 2020. All rights reserved.
 """
 import time
 import logging

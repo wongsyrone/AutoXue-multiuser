@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+
 """
 @project: AutoXue-multiuser
-@file: updateTiku.py
-@author: Yang
-@contact: https://github.com/yangzuoming/AutoXue-multiuser
-@time: 2020年9月7日
+@file: __main__.py
+@time: 2020年9月29日10:55:28
 @Copyright © 2020. All rights reserved.
 """
+
 from __future__ import unicode_literals
 
 import json
