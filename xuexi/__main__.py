@@ -75,9 +75,9 @@ if __name__ == "__main__":
     print("本次学习以下账号：")
     print(users_list)
     # users_list = [
-    #     ['17660082669', 'Nopass.123'],
-    #     ['18605315732', '000000'],
-    #     ['17753166732', '000000'],
+    #     ['17600000000', 'Nopass.123'],
+    #     ['18600000000', '000000'],
+    #     ['1770000000', '000000'],
     # ]
     app = App()
     for index_u, user in enumerate(users_list):
@@ -99,6 +99,13 @@ if __name__ == "__main__":
                 except Exception as ex:
                     logger.info(f'退出登录出现如下异常：    %s' % ex)
                     app.safe_back()
+                    try:
+                        cancel = app.find_element('//*[@text="取消"]')
+                        logger.info("app响应慢，你的机器好卡顿啊！")
+                        cancel.click()
+                    except:
+                        logger.info("莫名其妙错误！")
+                        app.safe_back()
 
                 if time.time() - t > 3600:
                     print('程序存在错误，试了一个小时都不行，换下个号码刷')

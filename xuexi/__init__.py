@@ -246,7 +246,17 @@ class App(Automation):
         titles = ["登录", "我要选读文章", "视听学习", "视听学习时长", "每日答题", "每周答题", "专项答题",
                   "挑战答题", "争上游答题", "双人对战", "订阅", "分享", "发表观点", "本地频道"]
         # time.sleep(15)
-        self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@text="本地频道"]')))
+        try:
+            self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@text="本地频道"]')))
+        except:
+            logger.info("没有等到得分页面！")
+            try:
+                cancel = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@text="取消"]')))
+                logger.info("app响应慢，你的机器好卡顿啊！")
+                cancel.click()
+            except:
+                logger.info("莫名其妙错误！")
+                self.safe_back()
         score_list = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['score_list'])))
 
         # score_list = self.find_elements(rules["score_list"])
