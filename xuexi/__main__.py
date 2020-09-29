@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-@project: AutoXue
+@project: AutoXue-multiuser
 @file: __main__.py
-@author: kessil
-@contact: https://github.com/kessil/AutoXue/
-@time: 2019-10-26(星期六) 10:22
-@Copyright © 2019. All rights reserved.
+@time: 2020年9月29日10:55:28
+@Copyright © 2020. All rights reserved.
 """
 import subprocess
 from argparse import ArgumentParser
@@ -37,7 +35,7 @@ def start():
     logger.debug(f'视听学习置后')
     app.music()
     # app.poem()
-    shuffle([app.daily, app.challenge, app.read, app.weekly])
+    shuffle([app.daily, app.challenge, app.zhengshangyou, app.read, app.weekly])
     app.view_score()
     app.watch()
     app.logout_or_not()

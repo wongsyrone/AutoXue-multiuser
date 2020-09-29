@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-
+"""
+@project: AutoXue-multiuser
+@file: __main__.py
+@time: 2020年9月29日10:55:28
+@Copyright © 2020. All rights reserved.
+"""
 import json
 import requests
 from xuexi.unit import cfg, logger
