@@ -98,12 +98,12 @@ if __name__ == "__main__":
                     logger.info(f'退出登录出现如下异常：    %s' % ex)
                     app.safe_back()
                     try:
-                        cancel = app.find_element('//*[@text="等待"]')
+                        cancel = app.find_element('//*[@text="取消"]')
                         logger.info("app响应慢，你的机器好卡顿啊！")
                         cancel.click()
                     except:
-                        logger.info("莫名其妙错误！很有可能app退出了！请手动点击app重新启动")
-                        # app.safe_back()
+                        logger.info("莫名其妙错误！很有可能app退出了！重新启动")
+                        app.safe_back()
                         app.driver.activate_app()
 
                 if time.time() - t > 3600:
