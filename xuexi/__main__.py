@@ -35,7 +35,7 @@ def start():
     logger.debug(f'视听学习置后')
     app.music()
     # app.poem()
-    shuffle([app.daily, app.challenge, app.zhengshangyou, app.read, app.weekly])
+    shuffle([app.daily, app.challenge, app.zhengshangyou, app.shuangrenduizhan, app.read, app.weekly])
     app.view_score()
     app.watch()
     app.logout_or_not()
@@ -45,7 +45,7 @@ def start():
 
 
 def test():
-    app.zhengshangyou()
+    app.shuangrenduizhan()
     logger.info(f'测试完毕')
 
 
@@ -74,7 +74,8 @@ if __name__ == "__main__":
     print(users_list)
     # users_list = [
     #     ['17600000000', 'Nopass.123'],
-    #     ['18600000000', '000000'],
+    #     ['18600000000', '0000
+    #     00'],
     #     ['1770000000', '000000'],
     # ]
     app = App()
@@ -103,9 +104,9 @@ if __name__ == "__main__":
                         cancel.click()
                     except:
                         logger.info("莫名其妙错误！很有可能app退出了！重新启动")
-                        # app.safe_back()
+                        app.safe_back()
                         # app.driver.close_app()
-                        app.driver.activate_app()
+                        # app.driver.activate_app()
 
                 if time.time() - t > 3600:
                     print('程序存在错误，试了一个小时都不行，换下个号码刷')

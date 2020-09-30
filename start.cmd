@@ -22,8 +22,8 @@ if errorlevel 1 (
 
 
 :run
-REM echo python -m xuexi
-python -m xuexi
+REM echo venv\scripts\python -m xuexi
+venv\scripts\python -m xuexi
 pause
 exit
 

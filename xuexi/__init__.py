@@ -170,6 +170,7 @@ class App(Automation):
         self._challenge_init()
         self._weekly_init()
         self._zhengshangyou_init()
+        self._shuangrenduizhan_init()
 
     def login_or_not(self):
         # com.alibaba.android.user.login.SignUpWithPwdActivity
@@ -462,6 +463,15 @@ class App(Automation):
         else:
             self.zhengshangyou_count = 2
 
+    # 争上游模块初始化
+    def _shuangrenduizhan_init(self):
+        g, t = self.score["双人对战"]
+        if t == g:
+            self.shuangrenduizhan_count = 0
+        else:
+            self.shuangrenduizhan_count = 1
+
+
     # 挑战答题模块
     # class Challenge(App):
     def _challenge_init(self):
@@ -557,8 +567,76 @@ class App(Automation):
             (By.XPATH, '//*[@text="开始比赛"]')))
         self.safe_click('//*[@text="开始比赛"]')
         while True:
-            content = self.wait.until(EC.presence_of_element_located(
-                (By.XPATH, rules['challenge_content']))).get_attribute("name")
+            try:
+                content = self.wait.until(EC.presence_of_element_located(
+                    (By.XPATH, rules['challenge_content']))).get_attribute("name")
+            except:
+                logger.info(f'获取不到题目，八成输了，结束本轮！')
+                break
+            content = content.replace("\x20", " ")
+            content = content.replace("\xa0", " ")
+            content = content[3:]
+            option_elements = self.wait.until(EC.presence_of_all_elements_located(
+                (By.XPATH, rules['challenge_options'])))
+            options = [x.get_attribute("name") for x in option_elements]
+            logger.info(f'<{num}> {content}')
+            # 此处题目类型为”单选题“，不应该是挑战题，目前所有挑战题都是单选题。
+            answer = self._verify_tiaozhan(category='挑战题', content=content, options=options)
+            delay_time = 0
+            logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
+            try:
+                option_elements[ord(answer) - 65].click()
+            except:
+                # time.sleep(1)
+                self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
+                # zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                logger.info(f'本轮挑战结束,居然tm输给了别人！！！')
+                break
+            try:
+                time.sleep(1)
+                self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
+                # zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                logger.info(f'本轮挑战结束')
+                time.sleep(2)
+                break
+            except:
+                logger.debug(f'本题回答完毕，管他对不对，抓紧继续下一题')
+                time.sleep(2)
+                num += 1
+        else:
+            logger.debug("通过选项偏移，应该不会打印这句话，除非碰巧答案有误")
+            logger.debug("那么也好，延时30秒后结束挑战")
+            time.sleep(30)
+            self.safe_back('challenge -> share_page')  # 发现部分模拟器返回无效
+        # 更新后挑战答题需要增加一次返回
+        self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
+        return num
+
+    def _shuangrenduizhan_cycle(self):
+        self.safe_click(rules['shuangrenduizhan_entry'])
+        num = 1
+        self.wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//*[@text="邀请对手"]')))
+        self.safe_click('//*[@text="邀请对手"]//preceding-sibling::android.view.View')
+        time.sleep(1)
+        try:
+            self.driver.find_element_by_xpath('//*[@text="开始对战"]//preceding-sibling::android.view.View//preceding'
+                                              '-sibling::android.view.View/android.view.View/android.view.View'
+                                              '/android.view.View/android.widget.Image')
+        except:
+            logger.info("没找到对手，独孤求败了")
+            return
+        # self.wait.until(EC.presence_of_element_located(
+        #     (By.XPATH, '//*[@text="开始对战"]')))
+        self.safe_click('//*[@text="开始对战"]')
+        time.sleep(3)
+        while True:
+            try:
+                content = self.wait.until(EC.presence_of_element_located(
+                    (By.XPATH, rules['challenge_content']))).get_attribute("name")
+            except:
+                logger.info(f'获取不到题目，八成输了，结束本轮！')
+                break
             content = content.replace("\x20", " ")
             content = content.replace("\xa0", " ")
             content = content[3:]
@@ -627,6 +705,19 @@ class App(Automation):
                 self.safe_back()
                 continue
 
+    def _shuangrenduizhan(self):
+        if self.shuangrenduizhan_count == 0:
+            logger.info(f'双人对战已经得到满分，跳过 ')
+            return
+        else:
+            logger.info(f'双人对战走一波！ ')
+            result = self._shuangrenduizhan_cycle()
+            delay_time = random.randint(5, 10)
+            logger.info(f'本次双人对战作了 {result} 题')
+            time.sleep(delay_time)
+            self.safe_back()
+            self.safe_click('//*[@text="退出"]')
+
     def challenge(self):
         if 0 == self.challenge_count:
             logger.info(f'挑战答题积分已达成，无需重复挑战')
@@ -638,6 +729,7 @@ class App(Automation):
         self.safe_back('quiz -> mine')
         self.safe_back('mine -> home')
 
+    # 争上游答题模块
     def zhengshangyou(self):
         self.safe_click(rules['mine_entry'])
         self.safe_click(rules['quiz_entry'])
@@ -646,6 +738,14 @@ class App(Automation):
         self.safe_back('quiz -> mine')
         self.safe_back('mine -> home')
 
+    # 双人对战模块
+    def shuangrenduizhan(self):
+        self.safe_click(rules['mine_entry'])
+        self.safe_click(rules['quiz_entry'])
+        time.sleep(3)
+        self._shuangrenduizhan()
+        self.safe_back('quiz -> mine')
+        self.safe_back('mine -> home')
     # 每日答题模块
     # class Daily(App):
     def _daily_init(self):
@@ -808,7 +908,7 @@ class App(Automation):
         length_of_options = len(options)
         logger.info(f"单选题 {content}")
         logger.info(f"选项 {options}")
-        answer = self._verify("单选题", content, options)
+        answer = self._verify_tiaozhan("单选题", content, options)
         choose_index = ord(answer) - 65
         logger.info(f"提交答案 {answer}")
         option_elements[choose_index].click()
