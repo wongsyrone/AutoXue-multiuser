@@ -1435,17 +1435,18 @@ class App(Automation):
             logger.info('刷分过程出问题了，尝试退出app！')
             self.logout_or_not()
         except Exception as ex:
-            logger.info(f'退出出现异常：    %s, 尝试点击APP卡顿菜单' % ex)
+            logger.info(f'退出出现异常, 尝试点击APP卡顿菜单')
             if self.driver.current_package == caps["apppackage"]:
                 try:
                     logger.info('尝试点击"等待"按钮')
                     self.safe_click('//*[@text="等待"]')
                 except:
-                    logger.info('没有找到"等待"按钮，尝试点击"退出"按钮')
-                    self.safe_click('//*[@text="退出"]')
-                else:
-                    logger.info('没有找到"退出"按钮，尝试返回上一层')
-                    self.safe_back()
+                    try:
+                        logger.info('没有找到"等待"按钮，尝试点击"退出"按钮')
+                        self.safe_click('//*[@text="退出"]')
+                    except:
+                        logger.info('没有找到"退出"按钮，尝试返回上一层')
+                        self.safe_back()
             else:
                 self.driver.activate_app(caps["apppackage"])
 
