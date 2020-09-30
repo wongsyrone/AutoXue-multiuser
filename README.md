@@ -40,7 +40,6 @@
 5. 安装`Python`，请至少使用3.7+版本，推荐3.8
 
 ## 使用方法(windows)
-0. 克隆项目 `git clone https://github.com/kessil/AutoXue.git --depth 1`
 1. 双击运行`setup.cmd`
 2. 启动 `Appium` 和 `Nox`
 3. 双击运行 `start.cmd`
