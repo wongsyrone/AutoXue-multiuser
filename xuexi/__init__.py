@@ -169,6 +169,7 @@ class App(Automation):
         self._daily_init()
         self._challenge_init()
         self._weekly_init()
+        self._special_init()
         self._zhengshangyou_init()
         self._shuangrenduizhan_init()
 
@@ -341,8 +342,16 @@ class App(Automation):
                     pattern = re.sub(r'\s+', '(.+?)', dest)
                     logger.debug(f'匹配模式 {pattern}')
                     res = re.findall(pattern, tips)
-                    if 1 == len(res):
-                        return res[0]
+                    pattern_reverse = re.sub(r'\s+', '(.+?)', dest[::-1])
+                    res_reverse = re.findall(pattern_reverse, tips[::-1])
+                    # logger.info(res)
+                    # logger.info(res_reverse)
+                    if 1 == len(res) and 1 == len(res_reverse):
+                        if res[0] <= res_reverse[0][::-1]:
+                            return res[0]
+                        else:
+                            return res_reverse[0][::-1]
+
                 logger.debug(f'多处填空题难以预料结果，索性不处理')
                 return None
 
@@ -821,8 +830,9 @@ class App(Automation):
         # contents = self.find_elements(rules["daily_blank_content"])
         # content = " ".join([x.get_attribute("name") for x in contents])
         logger.debug(f'len of blank contents is {len(contents)}')
+        # logger.info(contents)
         if 1 < len(contents):
-            # 针对作妖的UI布局某一版            
+            # 针对作妖的UI布局某一版
             content, spaces = "", []
             for item in contents:
                 content_text = item.get_attribute("name")
@@ -833,7 +843,6 @@ class App(Automation):
 
                     spaces.append(length_of_spaces)
                     content += " " * (length_of_spaces)
-
 
         else:
             # 针对作妖的UI布局某一版
@@ -924,23 +933,24 @@ class App(Automation):
             # notes = self.driver.find_element_by_xpath(rules["daily_notes"]).get_attribute("name")
             # logger.debug(f"解析 {notes}")
             self._submit(2)
-            self._update_bank({
-                "category": "单选题",
-                "content": content,
-                "options": options,
-                "answer": right_answer,
-                "excludes": "",
-                "notes": ""
-            })
+            # self._update_bank({
+            #     "category": "单选题",
+            #     "content": content,
+            #     "options": options,
+            #     "answer": right_answer,
+            #     "excludes": "",
+            #     "notes": ""
+            # })
         except:
-            self._update_bank({
-                "category": "单选题",
-                "content": content,
-                "options": options,
-                "answer": answer,
-                "excludes": "",
-                "notes": ""
-            })
+            return
+            # self._update_bank({
+            #     "category": "单选题",
+            #     "content": content,
+            #     "options": options,
+            #     "answer": answer,
+            #     "excludes": "",
+            #     "notes": ""
+            # })
 
     def _check(self):
         content = self.wait.until(EC.presence_of_element_located((By.XPATH, rules["daily_content"]))).get_attribute(
@@ -969,23 +979,24 @@ class App(Automation):
             # notes = self.driver.find_element_by_xpath(rules["daily_notes"]).get_attribute("name")
             # logger.debug(f"解析 {notes}")
             self._submit(2)
-            self._update_bank({
-                "category": "多选题",
-                "content": content,
-                "options": options,
-                "answer": right_answer,
-                "excludes": "",
-                "notes": ""
-            })
+            # self._update_bank({
+            #     "category": "多选题",
+            #     "content": content,
+            #     "options": options,
+            #     "answer": right_answer,
+            #     "excludes": "",
+            #     "notes": ""
+            # })
         except:
-            self._update_bank({
-                "category": "多选题",
-                "content": content,
-                "options": options,
-                "answer": answer,
-                "excludes": "",
-                "notes": ""
-            })
+            return
+            # self._update_bank({
+            #     "category": "多选题",
+            #     "content": content,
+            #     "options": options,
+            #     "answer": answer,
+            #     "excludes": "",
+            #     "notes": ""
+            # })
 
     def _dispatch(self, count_of_each_group):
         time.sleep(3)  # 如果模拟器比较流畅，这里的延时可以适当调短
@@ -1299,37 +1310,6 @@ class App(Automation):
         # 找指定的新闻阅读频道
         self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
         self._get_article_vol()
-        # vol_not_found = True
-        # while vol_not_found:
-        #     # 顶多右划4次，找不到就返回
-        #     right_slide = 3
-        #     while right_slide >= 0:
-        #         try:
-        #             volumns = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['article_volumn'])))
-        #         # volumns = self.find_elements(rules['article_volumn'])
-        #         except:
-        #             self.safe_back('mine -> home')
-        #             volumns = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['article_volumn'])))
-        #         first_vol = volumns[1]
-        #         for vol in volumns:
-        #             title = vol.get_attribute("name")
-        #             logger.debug(title)
-        #             if self.volumn_title == title:
-        #                 vol.click()
-        #                 # 找到约定栏目，标记退出循环
-        #                 vol_not_found = False
-        #                 right_slide = -2
-        #                 break
-        #         else:
-        #             logger.debug(f'未找到 {self.volumn_title}，右划')
-        #             # self.safe_click(rules['article_share'])
-        #             # self.safe_back('mine -> home')
-        #             self.driver.scroll(vol, first_vol, duration=500)
-        #             right_slide = right_slide - 1
-        #     else:
-        #         self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
-        # self.safe_back('mine -> home')
-        # self._kaleidoscope()
         self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
         self._kaleidoscope()
         self._get_article_vol()
@@ -1451,6 +1431,7 @@ class App(Automation):
                         self.safe_back()
             else:
                 self.driver.activate_app(caps["apppackage"])
+                time.sleep(5)
 
     def watch(self):
         self._watch(self.video_count)
@@ -1486,9 +1467,9 @@ class App(Automation):
         self.safe_back('weekly list -> quiz')
 
     def weekly(self):
-        ''' 每周答题
+        """ 每周答题
             复用每日答题的方法，无法保证每次得满分，如不能接受，请将配置workdays设为0
-        '''
+        """
         day_of_week = datetime.now().isoweekday()
         if str(day_of_week) not in self.workdays:
             logger.debug(f'今日不宜每周答题 {day_of_week} / {self.workdays}')
@@ -1502,3 +1483,58 @@ class App(Automation):
         self._weekly()
         self.safe_back('quiz -> mine')
         # self.safe_back('mine -> home')
+
+    def _special_init(self):
+        self.special_topic = cfg.get("prefers", "special_topic")
+        logger.debug(f"专项答题: {self.special_topic}")
+
+    def _special(self):
+        self.safe_click(rules["special_entry"])
+        try:
+            titles = self.wait.until(
+                EC.presence_of_all_elements_located((By.XPATH, '//*[@text="开始答题"]')))
+        except:
+            logger.info("所有专项答题全部答完，等待更新后再来刷！")
+            self.safe_back()
+            return
+        titles[-1].click()
+        logger.info(f'专项答题, 开始！')
+        time.sleep(random.randint(1, 3))
+        self._special_dispatch(10)  # 这里和每日答题不一样，每道题有分值，需要重构
+        self.safe_back('weekly report -> weekly list')
+        self.safe_back('weekly list -> quiz')
+
+    def special(self):
+        """ 专项答题
+            复用每日答题的方法，无法保证每次得满分，如不能接受，请将配置special_topic设为disable
+        """
+        if self.special_topic != 'enable':
+            logger.info(f'没有打开专项答题开关，跳过！')
+            return
+        g, t = self.score["专项答题"]
+        if g > 0:
+            logger.info(f'专项答题已经有积分，不再重复答题！')
+            return
+        self.safe_click(rules['mine_entry'])
+        self.safe_click(rules['quiz_entry'])
+        time.sleep(3)
+        self._special()
+        self.safe_back('quiz -> mine')
+
+    def _special_dispatch(self, count_of_each_group):
+        time.sleep(3)  # 如果模拟器比较流畅，这里的延时可以适当调短
+        for i in range(count_of_each_group):
+            logger.debug(f'正在答题 第 {i + 1} / {count_of_each_group} 题')
+            try:
+                category = self.driver.find_element_by_xpath(rules["special_category"]).get_attribute("name")
+            except NoSuchElementException as e:
+                logger.error(f'无法获取题目类型')
+                raise e
+            if "填空题" in category:
+                self._blank()
+            elif "单选题" in category:
+                self._radio()
+            elif "多选题" in category:
+                self._check()
+            else:
+                logger.error(f"未知的题目类型: {category}")
