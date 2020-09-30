@@ -471,7 +471,6 @@ class App(Automation):
         else:
             self.shuangrenduizhan_count = 1
 
-
     # 挑战答题模块
     # class Challenge(App):
     def _challenge_init(self):
@@ -612,7 +611,7 @@ class App(Automation):
         self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
         return num
 
-    def _shuangrenduizhan_cycle(self):
+    def _2_ren_cycle(self):
         self.safe_click(rules['shuangrenduizhan_entry'])
         num = 1
         self.wait.until(EC.presence_of_element_located(
@@ -711,7 +710,7 @@ class App(Automation):
             return
         else:
             logger.info(f'双人对战走一波！ ')
-            result = self._shuangrenduizhan_cycle()
+            result = self._2_ren_cycle()
             delay_time = random.randint(5, 10)
             logger.info(f'本次双人对战作了 {result} 题')
             time.sleep(delay_time)
@@ -746,6 +745,7 @@ class App(Automation):
         self._shuangrenduizhan()
         self.safe_back('quiz -> mine')
         self.safe_back('mine -> home')
+
     # 每日答题模块
     # class Daily(App):
     def _daily_init(self):
@@ -1429,6 +1429,25 @@ class App(Automation):
             self.safe_back('video -> bailing')
             logger.debug(f'正在返回首页...')
             self.safe_click(rules['home_entry'])
+
+    def refresh(self):
+        try:
+            logger.info('刷分过程出问题了，尝试退出app！')
+            self.logout_or_not()
+        except Exception as ex:
+            logger.info(f'退出出现异常：    %s, 尝试点击APP卡顿菜单' % ex)
+            if self.driver.current_package == caps["apppackage"]:
+                try:
+                    logger.info('尝试点击"等待"按钮')
+                    self.safe_click('//*[@text="等待"]')
+                except:
+                    logger.info('没有找到"等待"按钮，尝试点击"退出"按钮')
+                    self.safe_click('//*[@text="退出"]')
+                else:
+                    logger.info('没有找到"退出"按钮，尝试返回上一层')
+                    self.safe_back()
+            else:
+                self.driver.activate_app(caps["apppackage"])
 
     def watch(self):
         self._watch(self.video_count)
