@@ -103,7 +103,7 @@ if __name__ == "__main__":
                         logger.info("app响应慢，你的机器好卡顿啊！")
                         cancel.click()
                     except:
-                        logger.info("莫名其妙错误！很有可能app退出了！重新启动")
+                        logger.info("莫名其妙错误！很有可能app退出了！请手动点击app重新启动")
                         app.safe_back()
                         # app.driver.close_app()
                         # app.driver.activate_app()
