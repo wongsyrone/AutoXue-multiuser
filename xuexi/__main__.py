@@ -51,25 +51,25 @@ def test():
 
 if __name__ == "__main__":
 
-    # # 更新题库
+    # 更新题库
     # xuexitiaozhan = Tiku()
     # xuexitiaozhan.get_tiku()
 
     # 获取用户名列表
     user_list = []
     users_list = []
-    uservalue = True
+    user_value = True
     for username in usernames.values():
         # logger.info(username)
-        if uservalue:
+        if user_value:
             user_list.append(username)
-            uservalue = False
+            user_value = False
         else:
             user_list.append(username)
             users_list.append(user_list)
             # print(user_list)
             user_list = []
-            uservalue = True
+            user_value = True
     print("本次学习以下账号：")
     print(users_list)
     # users_list = [
@@ -89,27 +89,8 @@ if __name__ == "__main__":
                 start()
                 break
             except Exception as ex:
-                logger.info(f'刷分出现如下异常：    %s' % ex)
-                try:
-                    app.logout_or_not()
-                    # app.driver.close_app()
-                    # app.driver.session.clear()
-                    # app.driver.quit()
-                except Exception as ex:
-                    logger.info(f'退出登录出现如下异常：    %s' % ex)
-                    app.safe_back()
-                    try:
-                        cancel = app.find_element('//*[@text="等待"]')
-                        logger.info("app响应慢，你的机器好卡顿啊！")
-                        cancel.click()
-                    except:
-                        logger.info("莫名其妙错误！很有可能app退出了！请手动点击app重新启动")
-                        app.safe_back()
-                        # app.driver.close_app()
-                        # app.driver.activate_app()
-
+                app.refresh()
                 if time.time() - t > 3600:
-                    print('程序存在错误，试了一个小时都不行，换下个号码刷')
                     logger.info(f'程序存在错误，试了一个小时都不行，换下个号码刷')
                     break
     sys.exit(0)
