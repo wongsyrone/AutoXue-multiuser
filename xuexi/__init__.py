@@ -249,7 +249,7 @@ class App(Automation):
         except:
             logger.info("没有等到得分页面！")
             try:
-                cancel = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@text="取消"]')))
+                cancel = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@text="等待"]')))
                 logger.info("app响应慢，你的机器好卡顿啊！")
                 cancel.click()
             except:
