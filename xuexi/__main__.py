@@ -100,7 +100,7 @@ if __name__ == "__main__":
                     logger.info(f'退出登录出现如下异常：    %s' % ex)
                     app.safe_back()
                     try:
-                        cancel = app.find_element('//*[@text="取消"]')
+                        cancel = app.find_element('//*[@text="等待"]')
                         logger.info("app响应慢，你的机器好卡顿啊！")
                         cancel.click()
                     except:
