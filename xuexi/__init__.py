@@ -467,10 +467,10 @@ class App(Automation):
         g, t = self.score["争上游答题"]
         if t == g:
             self.zhengshangyou_count = 0
-        elif g > 0:
-            self.zhengshangyou_count = 1
-        else:
+        elif g == 0:
             self.zhengshangyou_count = 2
+        else:
+            self.zhengshangyou_count = 0
 
     # 争上游模块初始化
     def _shuangrenduizhan_init(self):
@@ -1490,6 +1490,7 @@ class App(Automation):
 
     def _special(self):
         self.safe_click(rules["special_entry"])
+        # 这里需要增加下滑模块
         try:
             titles = self.wait.until(
                 EC.presence_of_all_elements_located((By.XPATH, '//*[@text="开始答题"]')))
