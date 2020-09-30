@@ -468,6 +468,8 @@ class App(Automation):
         g, t = self.score["双人对战"]
         if t == g:
             self.shuangrenduizhan_count = 0
+        elif g == 1:
+            self.shuangrenduizhan_count = 0
         else:
             self.shuangrenduizhan_count = 1
 
