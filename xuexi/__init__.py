@@ -152,6 +152,10 @@ class App(Automation):
 
         # self.login_or_not()
         self.driver.wait_activity('com.alibaba.android.rimet.biz.home.activity.HomeActivity', 20, 3)
+        # self.wait.until(EC.presence_of_element_located((
+        #     By.XPATH, '//*[@resource-id="cn.xuexi.android:id/tvv_video_render"]')))
+        # self.wait.until_not(EC.presence_of_element_located((
+        #     By.XPATH, '//*[@resource-id="cn.xuexi.android:id/tvv_video_render"]')))
         # self.view_score()
         # self._read_init()
         # self._view_init()
@@ -1420,8 +1424,8 @@ class App(Automation):
             logger.info(f'退出出现异常, 尝试点击APP卡顿菜单')
             if self.driver.current_package == caps["apppackage"]:
                 try:
-                    logger.info('尝试点击"等待"按钮')
-                    self.safe_click('//*[@text="等待"]')
+                    logger.info('尝试点击"等待或者取消"按钮')
+                    self.safe_click('//*[@text="等待" or @text="取消"]')
                 except:
                     try:
                         logger.info('没有找到"等待"按钮，尝试点击"退出"按钮')
@@ -1491,17 +1495,25 @@ class App(Automation):
     def _special(self):
         self.safe_click(rules["special_entry"])
         # 这里需要增加下滑模块
-        try:
+        while True:
             titles = self.wait.until(
                 EC.presence_of_all_elements_located((By.XPATH, '//*[@text="开始答题"]')))
-        except:
-            logger.info("所有专项答题全部答完，等待更新后再来刷！")
-            self.safe_back()
-            return
-        titles[-1].click()
+            if 0 == len(titles):
+                logger.info("本页所有专题全部答完，下滑寻找新的专题！")
+                self.swipe_up()
+                try:
+                    self.driver.find_elements_by_xpath('//*[@text="您已经看到了我的底线"]')
+                    logger.info("滑到底了！,找不到未做的题目，退出。")
+                    self.safe_back()
+                    return
+                except:
+                    continue
+            else:
+                break
+        titles[0].click()
         logger.info(f'专项答题, 开始！')
         time.sleep(random.randint(1, 3))
-        self._special_dispatch(10)  # 这里和每日答题不一样，每道题有分值，需要重构
+        self._special_dispatch(10)  # 这里和每日答题不一样，首先比对题库，其次在看提示蒙题
         self.safe_back('weekly report -> weekly list')
         self.safe_back('weekly list -> quiz')
 
