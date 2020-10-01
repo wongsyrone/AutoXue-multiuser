@@ -68,7 +68,7 @@ if __name__ == "__main__":
             user_list.append(username)
             users_list.append(user_list)
             # print(user_list)
-            user_list = []
+            # user_list = []
             user_value = True
     print("本次学习以下账号：")
     print(users_list)
