@@ -92,14 +92,15 @@ if __name__ == "__main__":
         while True:
             try:
                 app.initapp(user[0], user[1])
-                test()
-                # start()
+                # test()
+                start()
                 break
             except Exception as ex:
                 logger.info("刷分出现如下错误:")
                 logger.info(ex)
-                if connect_error(ex):
+                if "An unknown server-side error occurred while processing" in str(ex):
                     try:
+                        logger.info("尝试重启APP")
                         app.driver.close_app()
                         app.driver.session.clear()
                         app.driver.quit()

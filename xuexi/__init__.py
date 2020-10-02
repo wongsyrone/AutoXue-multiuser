@@ -165,7 +165,7 @@ class App(Automation):
     def initapp(self, username="", password=""):
         self.username = username
         self.password = password
-        # self.login_or_not()
+        self.login_or_not()
         self.view_score()
         self._read_init()
         self._view_init()
@@ -323,9 +323,9 @@ class App(Automation):
             answer = None
         else:
             answer = self.bank["answer"]
-        logger.info(f'本地搜索答案如下: {answer}')
+        # logger.info(f'本地搜索答案如下: {answer}')
         if answer is not None:
-            logger.info(f'已知的正确答案: {answer}')
+            logger.info(f'本地搜索已知的正确答案: {answer}')
             return answer
         excludes = self.bank["excludes"] if self.bank else ""
         tips = self._view_tips()
@@ -665,7 +665,7 @@ class App(Automation):
                     (By.XPATH, rules['challenge_content']))).get_attribute("name")
                 # logger.info(content)
             except:
-                time.sleep(1)
+                time.sleep(0.5)
                 try:
                     # time.sleep(1)
                     self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
@@ -676,17 +676,18 @@ class App(Automation):
                     break
                 except:
                     continue
-            content = content.replace("\x20", " ")
-            content = content.replace("\xa0", " ")
-            content = content[3:]
-            logger.info(f'<{num}> {content}')
+            init_content = content
             if content == last_content:
-                logger.info(f'还是上次题目，再等')
+                # logger.info(f'等待题目刷新！')
                 continue
+            content = content.replace("\x20", " ")
+            content = content.replace("\xa0", " ")[3:]
+            # content = content[3:]
+            # logger.info(f'<{num}> {content}')
             option_elements = self.wait.until(EC.presence_of_all_elements_located(
                 (By.XPATH, rules['challenge_options'])))
-            options = [x.get_attribute("name") for x in option_elements]
-            logger.info(f'<{num}> {content}')
+            options = [x.get_attribute("name")[3:] for x in option_elements]
+            # logger.info(f'<{num}> {content}')
             answer = self._verify(category='挑战题', content=content, options=options)
             try:
                 option_elements[ord(answer) - 65].click()
@@ -698,8 +699,8 @@ class App(Automation):
                 except:
                     break
 
-            logger.debug(f'本题回答完毕，抓紧继续下一题')
-            last_content = content
+            # logger.debug(f'本题回答完毕，抓紧继续下一题')
+            last_content = init_content
             num += 1
         # 更新后挑战答题需要增加一次返回
         self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
@@ -794,14 +795,14 @@ class App(Automation):
 
     def _zhengshangyou(self):
         cyclenum = self.zhengshangyou_count
-        cyclenum = 5
+        # cyclenum = 5
         if cyclenum == 0:
             logger.info(f'争上游已经得到满分，跳过 ')
             return
         else:
             logger.info(f'争上游走{cyclenum}波！ ')
             while cyclenum > 0:
-                result = self._zhengshangyou_cycle()
+                result = self._zhengshangyou_cycle() - 1
                 delay_time = random.randint(5, 10)
                 logger.info(f'本次争上游作对 {result} 题')
                 time.sleep(delay_time)
@@ -1022,7 +1023,7 @@ class App(Automation):
         length_of_options = len(options)
         logger.info(f"单选题 {content}")
         logger.info(f"选项 {options}")
-        answer = self._verify_tiaozhan("单选题", content, options)
+        answer = self._verify("单选题", content, options)
         choose_index = ord(answer) - 65
         logger.info(f"提交答案 {answer}")
         option_elements[choose_index].click()
@@ -1265,7 +1266,7 @@ class App(Automation):
                 article.click()
                 num -= 1
                 logger.info(f'<{num}> 当前篇目 {title}')
-                article_delay = random.randint(60, 60 + min(10, self.read_count))
+                article_delay = random.randint(90, 90 + min(10, self.read_count))
                 logger.info(f'阅读时间估计 {article_delay} 秒...')
                 while article_delay > 0:
                     if article_delay < 20:

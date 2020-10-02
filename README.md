@@ -10,6 +10,9 @@ special_topic = enable
 3、关于争上游搞不过别人的问题，因为采用了模糊比对的方法，如果要提高刷分效率，一定要安装python-Levenshtein；
 参考：https://zhuanlan.zhihu.com/p/53135935
 
+https://blog.csdn.net/sky_limitless/article/details/90291893
+如遇安装python-Levenshtein失败，参考上面链接的“5. 第二种尝试 直接下载 .whl文件，直接安装”，但是注意自己安装的Python版本，如Python是3.8版本就需要下载对应的“Levenshtein-0.12.0-cp38-cp38m-win_amd64.whl”然后就可以顺利安装。(感谢tonylemon提供)
+
 4、有的网友start提示错误，我重新修改了python命令，各位一定要配置环境变量python，按照原作者的说明配置好。
 # 2020年9月30日
 1、增加了双人对战
