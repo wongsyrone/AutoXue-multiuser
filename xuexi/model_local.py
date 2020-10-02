@@ -7,10 +7,8 @@
 @Copyright © 2020. All rights reserved.
 """
 import json
-import requests
 from xuexi.unit import cfg, logger
 from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
 
 
 class Structure:
@@ -49,31 +47,30 @@ class Bank(Structure):
 
 class TikuQuery:
     def __init__(self):
-        self.dataKu = cfg.get('api', 'datajson')
-        with open(self.dataKu, 'r', encoding='utf8') as f:
+        self.dataKu_file = cfg.get('api', 'datajson')
+        with open(self.dataKu_file, 'r', encoding='utf8') as f:
             self.dataKu = json.load(f)
 
-        with open('./data_back.json', 'r', encoding='utf8') as f:
-            self.dataKu_test = json.load(f)
-
-    def post(self, contentstr, options):
-
-        logger.info("开始比较题库")
+    def post(self, item):
+        # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
+        if "" == item["content"]:
+            logger.debug(f'content is empty')
+            return None
+        # logger.debug(f'GET {item["content"]}...')
+        # 精确查找一次
         for dataKuItem in self.dataKu:
-            # if dataKuItem['content'] == contentstr:
-            ratioscore = fuzz.ratio(dataKuItem['content'], contentstr)
-            if ratioscore > 60:
-                # logger.info(dataKuItem['content'] + "  比较  " + contentstr + "得分：")
-                if options == dataKuItem['options']:
-                    logger.info(f"匹配到题目，得分：{ratioscore}")
-                    return dataKuItem['answer']
-                elif fuzz.ratio(options, dataKuItem['options']) > 65:
-                    logger.info(f"匹配到题目，得分：{ratioscore}")
-                    logger.info(fuzz.ratio(options, dataKuItem['options']))
-                    return dataKuItem['answer']
-
+            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem['options'] == item["options"]:
+                return dataKuItem
             else:
                 continue
+        # 如果找不到题目，模糊搜索一次
+        for dataKuItem in self.dataKu:
+            if dataKuItem['category'] == item["category"] and fuzz.ratio(dataKuItem['content'],
+                                                                         item["content"]) > 60 and fuzz.ratio(dataKuItem['options'], item["options"]) > 65:
+                return dataKuItem
+            else:
+                continue
+        return None
 
     def post_2(self, item):
         # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
@@ -81,31 +78,29 @@ class TikuQuery:
             logger.debug(f'content is empty')
             return None
         logger.debug(f'GET {item["content"]}...')
-        for dataKuItem_test in self.dataKu_test:
-            if dataKuItem_test['category'] == item["category"] and dataKuItem_test['content'] == item["content"] and \
-                    dataKuItem_test[
+        for dataKuItem in self.dataKu:
+            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and \
+                    dataKuItem[
                         'options'] == item["options"]:
-                return dataKuItem_test
+                return dataKuItem
             else:
                 continue
         for dataKuItem in self.dataKu:
             if dataKuItem['category'] == item["category"] and fuzz.ratio(dataKuItem['content'],
-                                                                         item["content"]) > 60 and fuzz.ratio(
-                dataKuItem['options'], item["options"]) > 65:
+                                                                         item["content"]) > 60 and fuzz.ratio(dataKuItem['options'], item["options"]) > 65:
                 return dataKuItem
             else:
                 continue
         return None
 
-    def post_1(self, item):
-        # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
+    def post_precise(self, item):
+        logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
         if "" == item["content"]:
             logger.debug(f'content is empty')
             return None
         logger.debug(f'GET {item["content"]}...')
-        for dataKuItem in self.dataKu_test:
-            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[
-                'options'] == item["options"]:
+        for dataKuItem in self.dataKu:
+            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem['options'] == item["options"]:
                 return dataKuItem
             else:
                 continue
@@ -117,9 +112,9 @@ class TikuQuery:
             return False
         logger.debug(f'PUT {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
         try:
-            out_file = open("./data_back.json", "w", encoding='utf8')
-            self.dataKu_test.append(item)
-            json.dump(self.dataKu_test, out_file, indent=6, ensure_ascii=False)
+            out_file = open("./data1.json", "w", encoding='utf8')
+            self.dataKu.append(item)
+            json.dump(self.dataKu, out_file, indent=6, ensure_ascii=False)
             out_file.close()
             return True
         except Exception as ex:
@@ -136,7 +131,7 @@ class TikuQuery:
             logger.debug(f'content is empty')
             return None
         logger.debug(f'GET {item["content"]}...')
-        for dataKuItem in self.dataKu_test:
+        for dataKuItem in self.dataKu:
             if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[
                 'options'] == item["options"]:
                 return dataKuItem['answer']

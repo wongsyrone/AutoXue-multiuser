@@ -52,7 +52,7 @@ def connect_error(exMess):
 
 
 def test():
-    app.challenge_test()
+    app.zhengshangyou()
     logger.info(f'测试完毕')
 
 
