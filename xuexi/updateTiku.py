@@ -62,7 +62,7 @@ class Tiku:
     # 获取试题
     def get_tiku(self):
         # 打开题库文件
-        out_file = open("./data_back.json", "w", encoding='utf8')
+        out_file = open("./data1.json", "w", encoding='utf8')
         out_file.write("[\n")
         # 判断URL链接
         url = "https://github.com/ztianming/xuexi.cn"
