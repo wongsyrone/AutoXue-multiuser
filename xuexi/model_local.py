@@ -12,6 +12,7 @@ from xuexi.unit import cfg, logger
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
+
 class Structure:
     _fields = []
 
@@ -52,13 +53,11 @@ class TikuQuery:
         with open(self.dataKu, 'r', encoding='utf8') as f:
             self.dataKu = json.load(f)
 
+        with open('./data_back.json', 'r', encoding='utf8') as f:
+            self.dataKu_test = json.load(f)
+
     def post(self, contentstr, options):
-        # if not dataFile:
-        #     dataFile = self.dataKu
-        # # if "" == item["content"]:
-        # #     logger.debug(f'content is empty')
-        # with open(dataFile, 'r', encoding='utf8') as f:
-        #     dataKu = json.load(f)
+
         logger.info("开始比较题库")
         for dataKuItem in self.dataKu:
             # if dataKuItem['content'] == contentstr:
@@ -72,54 +71,75 @@ class TikuQuery:
                     logger.info(f"匹配到题目，得分：{ratioscore}")
                     logger.info(fuzz.ratio(options, dataKuItem['options']))
                     return dataKuItem['answer']
-                # else:
-                    # logger.info("没有找到匹配答案:")
-                    # logger.info(options)
-                    # logger.info("题库答案是：")
-                    # logger.info(dataKuItem['options'])
-                    # logger.info("匹配分数为：")
-                    # logger.info(fuzz.ratio(options, dataKuItem['options']))
+
             else:
                 continue
 
-    def put(self, item, url=None):
-        if not url:
-            url = self.url
+    def post_2(self, item):
+        # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
+        if "" == item["content"]:
+            logger.debug(f'content is empty')
+            return None
+        logger.debug(f'GET {item["content"]}...')
+        for dataKuItem_test in self.dataKu_test:
+            if dataKuItem_test['category'] == item["category"] and dataKuItem_test['content'] == item["content"] and \
+                    dataKuItem_test[
+                        'options'] == item["options"]:
+                return dataKuItem_test
+            else:
+                continue
+        for dataKuItem in self.dataKu:
+            if dataKuItem['category'] == item["category"] and fuzz.ratio(dataKuItem['content'],
+                                                                         item["content"]) > 60 and fuzz.ratio(
+                dataKuItem['options'], item["options"]) > 65:
+                return dataKuItem
+            else:
+                continue
+        return None
+
+    def post_1(self, item):
+        # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
+        if "" == item["content"]:
+            logger.debug(f'content is empty')
+            return None
+        logger.debug(f'GET {item["content"]}...')
+        for dataKuItem in self.dataKu_test:
+            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[
+                'options'] == item["options"]:
+                return dataKuItem
+            else:
+                continue
+        return None
+
+    def put(self, item):
         if "" == item["content"]:
             logger.debug(f'content is empty')
             return False
         logger.debug(f'PUT {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
         try:
-            res = requests.put(url=url, headers=self.headers, json=item)
-            if 201 == res.status_code:
-                logger.info('添加新记录')
-                return True
-            elif 200 == res.status_code:
-                logger.info('更新记录')
-                return True
-            else:
-                logger.debug("PUT do nothing")
-                return False
-        except:
+            out_file = open("./data_back.json", "w", encoding='utf8')
+            self.dataKu_test.append(item)
+            json.dump(self.dataKu_test, out_file, indent=6, ensure_ascii=False)
+            out_file.close()
+            return True
+        except Exception as ex:
+            logger.info(ex)
             return False
 
-    def get(self, item, url=None):
-        if not url:
-            url = self.url
+    def get(self, item):
+
+        if "" == item["content"]:
+            logger.debug(f'content is empty')
+            return False
+            # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
         if "" == item["content"]:
             logger.debug(f'content is empty')
             return None
         logger.debug(f'GET {item["content"]}...')
-        try:
-            res = requests.post(url=url, headers=self.headers, json=item)
-            if 200 == res.status_code:
-                logger.debug(f'GET item success')
-                # logger.debug(res.text)
-                # logger.debug(json.loads(res.text))
-                return json.loads(res.text)
+        for dataKuItem in self.dataKu_test:
+            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[
+                'options'] == item["options"]:
+                return dataKuItem['answer']
             else:
-                logger.debug(f'GET item failure')
-                return None
-        except:
-            logger.debug('request faild')
-            return None
+                continue
+        return None

@@ -17,7 +17,6 @@ from itertools import accumulate
 from collections import defaultdict
 from appium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -255,11 +254,12 @@ class App(Automation):
         except:
             logger.info("没有等到得分页面！")
             try:
-                cancel = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@text="等待"]')))
+                cancel = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@text="取消"] or '
+                                                                                        '@text="退出"] or @text="等待"]')))
                 logger.info("app响应慢，你的机器好卡顿啊！")
                 cancel.click()
             except:
-                logger.info("莫名其妙错误！")
+                logger.info("app响应慢，你的机器好卡顿啊！！")
                 self.safe_back()
         score_list = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['score_list'])))
 
@@ -314,14 +314,20 @@ class App(Automation):
     def _verify(self, category, content, options):
         # 职责: 检索题库 查看提示
         letters = list("ABCDEFGHIJKLMN")
-        self.bank = self.query.post({
+        self.bank = self.query_local.post_2({
             "category": category,
             "content": content,
             "options": options
         })
-        if self.bank and self.bank["answer"]:
-            logger.info(f'已知的正确答案: {self.bank["answer"]}')
-            return self.bank["answer"]
+        # answer = self.query_local.post(category, content, options)
+        if not self.bank or not self.bank["answer"]:
+            answer = None
+        else:
+            answer = self.bank["answer"]
+        logger.info(f'本地搜索答案如下: {answer}')
+        if answer is not None:
+            logger.info(f'已知的正确答案: {answer}')
+            return answer
         excludes = self.bank["excludes"] if self.bank else ""
         tips = self._view_tips()
         if not tips:
@@ -462,9 +468,11 @@ class App(Automation):
                 logger.debug("题目类型非法")
 
     def _update_bank(self, item):
-        return  # 关闭更新功能，看到这里的朋友不要乱改哦，因为API已经拒绝了更新请求，改了也没用
-        if not self.bank or not self.bank["answer"]:
-            self.query.put(item)
+        # # return  # 关闭更新功能，看到这里的朋友不要乱改哦，因为API已经拒绝了更新请求，改了也没用
+        if self.query_local.post_1(item) is None:
+            self.query_local.put(item)
+        else:
+            return
 
     # 争上游模块初始化
     def _zhengshangyou_init(self):
@@ -524,7 +532,7 @@ class App(Automation):
             length_of_options = len(options)
             logger.info(f'<{num}> {content}')
             # 此处题目类型为”单选题“，不应该是挑战题，目前所有挑战题都是单选题。
-            answer = self._verify_tiaozhan(category='挑战题', content=content, options=options)
+            answer = self._verify(category='挑战题', content=content, options=options)
             delay_time = random.randint(self.challenge_delay_bot, self.challenge_delay_top)
             if 0 == num:
                 offset = random.randint(1, length_of_options - 1)  # randint居然包含上限值，坑爹！！！
@@ -543,7 +551,7 @@ class App(Automation):
                 wrong = self.driver.find_element_by_xpath(rules["challenge_over"])
                 logger.debug(f'很遗憾本题回答错误')
                 self._update_bank({
-                    "category": "单选题",
+                    "category": "挑战题",
                     "content": content,
                     "options": options,
                     "answer": "",
@@ -558,7 +566,76 @@ class App(Automation):
                 logger.debug(f'恭喜本题回答正确')
                 num -= 1
                 self._update_bank({
-                    "category": "单选题",
+                    "category": "挑战题",
+                    "content": content,
+                    "options": options,
+                    "answer": answer,
+                    "excludes": "",
+                    "notes": ""
+                })
+        else:
+            logger.debug("通过选项偏移，应该不会打印这句话，除非碰巧答案有误")
+            logger.debug("那么也好，延时30秒后结束挑战")
+            time.sleep(30)
+            self.safe_back('challenge -> share_page')  # 发现部分模拟器返回无效
+        # 更新后挑战答题需要增加一次返回
+        self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
+        return num
+
+    def _challenge_circle_test(self, num):
+        self.safe_click(rules['challenge_entry'])
+        offset = 0  # 自动答错的偏移开关
+        while num > -1:
+            content = self.wait.until(EC.presence_of_element_located(
+                (By.XPATH, rules['challenge_content']))).get_attribute("name")
+            # content = content.decode(encoding='UTF-8')
+            # content = re.sub("\"", "", content)
+            content = content.replace("\x20", " ")
+            content = content.replace("\xa0", " ")
+            # logger.info(content)
+            # content = self.find_element(rules["challenge_content"]).get_attribute("name")
+            option_elements = self.wait.until(EC.presence_of_all_elements_located(
+                (By.XPATH, rules['challenge_options'])))
+            # option_elements = self.find_elements(rules['challenge_options'])
+            options = [x.get_attribute("name") for x in option_elements]
+            length_of_options = len(options)
+            logger.info(f'<{num}> {content}')
+            # 此处题目类型为”单选题“，不应该是挑战题，目前所有挑战题都是单选题。
+            answer = self._verify(category='挑战题', content=content, options=options)
+            delay_time = random.randint(self.challenge_delay_bot, self.challenge_delay_top)
+            if 0 == num:
+                offset = random.randint(1, length_of_options - 1)  # randint居然包含上限值，坑爹！！！
+                logger.info(f'已完成指定题量，设置提交选项偏移 -{offset}')
+                logger.info(
+                    f'随机延时 {delay_time} 秒提交答案: {chr((ord(answer) - 65 - offset + length_of_options) % length_of_options + 65)}')
+            else:
+                logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
+            time.sleep(delay_time)
+            # 利用python切片的特性，即使索引值为-offset，可以正确取值
+            # if answer is None:
+            #     answer = "A"
+            option_elements[ord(answer) - 65 - offset].click()
+            try:
+                time.sleep(5)
+                wrong = self.driver.find_element_by_xpath(rules["challenge_over"])
+                logger.debug(f'很遗憾本题回答错误')
+                self._update_bank({
+                    "category": "挑战题",
+                    "content": content,
+                    "options": options,
+                    "answer": "",
+                    "excludes": answer,
+                    "notes": ""
+                })
+                logger.debug("点击结束本局")
+                wrong.click()  # 直接结束本局
+                time.sleep(5)
+                break
+            except:
+                logger.debug(f'恭喜本题回答正确')
+                num -= 1
+                self._update_bank({
+                    "category": "挑战题",
                     "content": content,
                     "options": options,
                     "answer": answer,
@@ -617,11 +694,6 @@ class App(Automation):
                 logger.debug(f'本题回答完毕，管他对不对，抓紧继续下一题')
                 time.sleep(2)
                 num += 1
-        else:
-            logger.debug("通过选项偏移，应该不会打印这句话，除非碰巧答案有误")
-            logger.debug("那么也好，延时30秒后结束挑战")
-            time.sleep(30)
-            self.safe_back('challenge -> share_page')  # 发现部分模拟器返回无效
         # 更新后挑战答题需要增加一次返回
         self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
         return num
@@ -681,14 +753,24 @@ class App(Automation):
                 logger.debug(f'本题回答完毕，管他对不对，抓紧继续下一题')
                 time.sleep(2)
                 num += 1
-        else:
-            logger.debug("通过选项偏移，应该不会打印这句话，除非碰巧答案有误")
-            logger.debug("那么也好，延时30秒后结束挑战")
-            time.sleep(30)
-            self.safe_back('challenge -> share_page')  # 发现部分模拟器返回无效
+
         # 更新后挑战答题需要增加一次返回
         self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
         return num
+
+    def _challenge_test(self):
+        self.challenge_count = 1000
+        logger.info(f'挑战答题 目标 {self.challenge_count} 题, Go!')
+        while True:
+            result = self._challenge_cycle(self.challenge_count)
+            if 0 >= result:
+                logger.info(f'已成功挑战 {self.challenge_count} 题，正在返回')
+                break
+            else:
+                delay_time = random.randint(2, 2)
+                logger.info(f'本次挑战 {self.challenge_count - result} 题，{delay_time} 秒后再来一组')
+                time.sleep(delay_time)
+                continue
 
     def _challenge(self):
         logger.info(f'挑战答题 目标 {self.challenge_count} 题, Go!')
@@ -740,6 +822,15 @@ class App(Automation):
         self.safe_click(rules['quiz_entry'])
         time.sleep(3)
         self._challenge()
+        self.safe_back('quiz -> mine')
+        self.safe_back('mine -> home')
+
+    def challenge_test(self):
+
+        self.safe_click(rules['mine_entry'])
+        self.safe_click(rules['quiz_entry'])
+        time.sleep(3)
+        self._challenge_test()
         self.safe_back('quiz -> mine')
         self.safe_back('mine -> home')
 
@@ -937,24 +1028,24 @@ class App(Automation):
             # notes = self.driver.find_element_by_xpath(rules["daily_notes"]).get_attribute("name")
             # logger.debug(f"解析 {notes}")
             self._submit(2)
-            # self._update_bank({
-            #     "category": "单选题",
-            #     "content": content,
-            #     "options": options,
-            #     "answer": right_answer,
-            #     "excludes": "",
-            #     "notes": ""
-            # })
+            self._update_bank({
+                "category": "单选题",
+                "content": content,
+                "options": options,
+                "answer": right_answer,
+                "excludes": "",
+                "notes": ""
+            })
         except:
+            self._update_bank({
+                "category": "单选题",
+                "content": content,
+                "options": options,
+                "answer": answer,
+                "excludes": "",
+                "notes": ""
+            })
             return
-            # self._update_bank({
-            #     "category": "单选题",
-            #     "content": content,
-            #     "options": options,
-            #     "answer": answer,
-            #     "excludes": "",
-            #     "notes": ""
-            # })
 
     def _check(self):
         content = self.wait.until(EC.presence_of_element_located((By.XPATH, rules["daily_content"]))).get_attribute(
@@ -983,24 +1074,24 @@ class App(Automation):
             # notes = self.driver.find_element_by_xpath(rules["daily_notes"]).get_attribute("name")
             # logger.debug(f"解析 {notes}")
             self._submit(2)
-            # self._update_bank({
-            #     "category": "多选题",
-            #     "content": content,
-            #     "options": options,
-            #     "answer": right_answer,
-            #     "excludes": "",
-            #     "notes": ""
-            # })
+            self._update_bank({
+                "category": "多选题",
+                "content": content,
+                "options": options,
+                "answer": right_answer,
+                "excludes": "",
+                "notes": ""
+            })
         except:
+            self._update_bank({
+                "category": "多选题",
+                "content": content,
+                "options": options,
+                "answer": answer,
+                "excludes": "",
+                "notes": ""
+            })
             return
-            # self._update_bank({
-            #     "category": "多选题",
-            #     "content": content,
-            #     "options": options,
-            #     "answer": answer,
-            #     "excludes": "",
-            #     "notes": ""
-            # })
 
     def _dispatch(self, count_of_each_group):
         time.sleep(3)  # 如果模拟器比较流畅，这里的延时可以适当调短
@@ -1381,7 +1472,7 @@ class App(Automation):
             EC.presence_of_element_located((By.XPATH, '//*[@resource-id="android:id/search_src_text"]')))
         # edit_area = self.find_element(rules['article_comments_edit'])
         edit_area.send_keys("唐诗三百首")
-        self.driver.keyevent('66')
+        self.driver.keyevent(66)
         time.sleep(8)
         self.safe_click('//android.view.View[@text="唐诗三百首·五言绝句"]')
         time.sleep(3)
@@ -1416,26 +1507,32 @@ class App(Automation):
             logger.debug(f'正在返回首页...')
             self.safe_click(rules['home_entry'])
 
-    def refresh(self):
-        try:
-            logger.info('刷分过程出问题了，尝试退出app！')
-            self.logout_or_not()
-        except Exception as ex:
-            logger.info(f'退出出现异常, 尝试点击APP卡顿菜单')
+    def refresh(self, num):
+        while num > 0:
+            num -= 1
             if self.driver.current_package == caps["apppackage"]:
                 try:
-                    logger.info('尝试点击"等待或者取消"按钮')
-                    self.safe_click('//*[@text="等待" or @text="取消"]')
-                except:
+                    logger.info('尝试退出登录！')
+                    self.logout_or_not()
+                    break
+                except Exception as ex:
+                    logger.info(f'退出出现异常, 尝试捕获APP卡顿菜单')
                     try:
-                        logger.info('没有找到"等待"按钮，尝试点击"退出"按钮')
-                        self.safe_click('//*[@text="退出"]')
+                        logger.info('尝试点击《等待》或者《取消》或者《退出》按钮')
+                        self.safe_click('//*[@text="等待" or @text="取消" or @text="退出"]')
+                        break
                     except:
-                        logger.info('没有找到"退出"按钮，尝试返回上一层')
+                        logger.info('没有找到相关按钮，尝试返回上一层再试试运气')
                         self.safe_back()
             else:
                 self.driver.activate_app(caps["apppackage"])
                 time.sleep(5)
+        if num == 0:
+            logger.info('就是tm退不出，重启app')
+            self.driver.close_app()
+            self.driver.session.clear()
+            self.driver.quit()
+            self.__init__()
 
     def watch(self):
         self._watch(self.video_count)

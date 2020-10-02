@@ -14,5 +14,6 @@ REM venv\scripts\python -m pip install appium -i https://pypi.tuna.tsinghua.edu.
 venv\scripts\python -m pip install lxml -i https://pypi.tuna.tsinghua.edu.cn/simple
 venv\scripts\python -m pip install beautifulsoup4 -i https://pypi.tuna.tsinghua.edu.cn/simple
 venv\scripts\python -m pip install fuzzywuzzy -i https://pypi.tuna.tsinghua.edu.cn/simple
+venv\scripts\python -m pip install python-Levenshtein -i https://pypi.tuna.tsinghua.edu.cn/simple
 REM echo packages installed OK.
 pause
