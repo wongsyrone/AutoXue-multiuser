@@ -52,10 +52,15 @@ class TikuQuery:
             self.dataKu = json.load(f)
 
     def post(self, item):
+
         # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
         if "" == item["content"]:
             logger.debug(f'content is empty')
             return None
+        # 单选题挑战题一致
+        if item["category"] == "单选题":
+            item["category"] == "挑战题"
+
         # logger.debug(f'GET {item["content"]}...')
         # 精确查找一次
         for dataKuItem in self.dataKu:
@@ -77,6 +82,9 @@ class TikuQuery:
         if "" == item["content"]:
             logger.debug(f'content is empty')
             return None
+        # 单选题挑战题一致
+        if item["category"] == "单选题":
+            item["category"] == "挑战题"
         logger.debug(f'GET {item["content"]}...')
         for dataKuItem in self.dataKu:
             if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and \
@@ -98,6 +106,9 @@ class TikuQuery:
         if "" == item["content"]:
             logger.debug(f'content is empty')
             return None
+        # 单选题挑战题一致
+        if item["category"] == "单选题":
+            item["category"] == "挑战题"
         logger.debug(f'GET {item["content"]}...')
         for dataKuItem in self.dataKu:
             if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem['options'] == item["options"]:
@@ -111,6 +122,9 @@ class TikuQuery:
             logger.debug(f'content is empty')
             return False
         logger.debug(f'PUT {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
+        # 单选题挑战题一致
+        if item["category"] == "单选题":
+            item["category"] == "挑战题"
         try:
             out_file = open("./data1.json", "w", encoding='utf8')
             self.dataKu.append(item)
@@ -123,13 +137,13 @@ class TikuQuery:
 
     def get(self, item):
 
-        if "" == item["content"]:
-            logger.debug(f'content is empty')
-            return False
-            # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
+        # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
         if "" == item["content"]:
             logger.debug(f'content is empty')
             return None
+        # 单选题挑战题一致
+        if item["category"] == "单选题":
+            item["category"] == "挑战题"
         logger.debug(f'GET {item["content"]}...')
         for dataKuItem in self.dataKu:
             if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[

@@ -1016,6 +1016,8 @@ class App(Automation):
     def _radio(self):
         content = self.wait.until(EC.presence_of_element_located((By.XPATH, rules["daily_content"]))).get_attribute(
             "name")
+        content = content.replace("\x20", " ")
+        content = content.replace("\xa0", " ")
         # content = self.find_element(rules["daily_content"]).get_attribute("name")
         option_elements = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules["daily_options"])))
         # option_elements = self.driver.find_elements(rules["daily_options"])

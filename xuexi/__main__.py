@@ -92,8 +92,8 @@ if __name__ == "__main__":
         while True:
             try:
                 app.initapp(user[0], user[1])
-                # test()
-                start()
+                test()
+                # start()
                 break
             except Exception as ex:
                 logger.info("刷分出现如下错误:")
