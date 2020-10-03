@@ -165,7 +165,7 @@ class App(Automation):
     def initapp(self, username="", password=""):
         self.username = username
         self.password = password
-        self.login_or_not()
+        # self.login_or_not()
         self.view_score()
         self._read_init()
         self._view_init()
@@ -723,7 +723,7 @@ class App(Automation):
         # self.wait.until(EC.presence_of_element_located(
         #     (By.XPATH, '//*[@text="开始对战"]')))
         self.safe_click('//*[@text="开始对战"]')
-        time.sleep(3)
+        time.sleep(5)
         while True:
             try:
                 content = self.wait.until(EC.presence_of_element_located(

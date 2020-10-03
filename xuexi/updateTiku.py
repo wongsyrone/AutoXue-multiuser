@@ -16,11 +16,11 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-
-# from unit import cfg, logger
-
-
 # 创建题库类
+from fuzzywuzzy import fuzz
+import Levenshtein
+
+
 class Tiku:
     _fields = ['id', 'category', 'content', 'options', 'answer', 'excludes', 'description']
 
@@ -112,9 +112,59 @@ class Tiku:
         out_file.write("]\n")
         out_file.close()
 
+    def _duplicate_check(self):
+        # 打开题库文件
+        # dataKu_file = cfg.get('api', 'datajson')
+        with open('../data1.json', 'r', encoding='utf8') as f:
+            dataKu = json.load(f)
+        dataKucopy = dataKu.copy()
+        for i in range(len(dataKu) - 1, -1, -1):
+            center = dataKu[i]
+            for p in dataKu[:i]:
+                if p['category'] == '挑战题' and fuzz.ratio(center['content'],
+                                                         p["content"]) > 60 and fuzz.ratio(
+                    center['options'], p["options"]) > 65 and center['answer'] == \
+                        p["answer"]:
+                    try:
+                        dataKucopy.remove(p)
+                        print("移除")
+                        print(p)
+                    except:
+                        continue
+
+        out_file = open("../data1.json", "w", encoding='utf8')
+        json.dump(dataKucopy, out_file, indent=6, ensure_ascii=False)
+        out_file.close()
+
+    def duplicate_check(self):
+        # 打开题库文件
+        # dataKu_file = cfg.get('api', 'datajson')
+        with open('../data1.json', 'r', encoding='utf8') as f:
+            dataKu = json.load(f)
+        # 查一次重复
+        for dataKuItem in dataKu:
+            dataKu_dupnum = 0
+            for dataKuItem_dup in dataKu:
+                if dataKuItem_dup['category'] == '挑战题' and fuzz.ratio(dataKuItem_dup['content'],
+                                                                      dataKuItem["content"]) > 60 and fuzz.ratio(
+                    dataKuItem_dup['options'], dataKuItem["options"]) > 65 and dataKuItem_dup['answer'] == \
+                        dataKuItem["answer"]:
+                    dataKu_dupnum += 1
+                    if dataKu_dupnum > 1:
+                        dataKu.remove(dataKuItem_dup)
+                        print("移除")
+                        print(dataKuItem_dup)
+                else:
+                    continue
+            out_file = open("../data_back.json", "w", encoding='utf8')
+            json.dump(dataKu, out_file, indent=6, ensure_ascii=False)
+            out_file.close()
+
+        print("去重完成")
+
 
 if __name__ == "__main__":
     xuexitiaozhan = Tiku()
-    xuexitiaozhan.get_tiku()
+    xuexitiaozhan._duplicate_check()
     # bq = TikuQuery()
     # bq.post("")
