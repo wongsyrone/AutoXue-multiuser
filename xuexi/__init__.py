@@ -165,7 +165,7 @@ class App(Automation):
     def initapp(self, username="", password=""):
         self.username = username
         self.password = password
-        # self.login_or_not()
+        self.login_or_not()
         self.view_score()
         self._read_init()
         self._view_init()
