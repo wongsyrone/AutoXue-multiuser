@@ -112,7 +112,7 @@ class Tiku:
         out_file.write("]\n")
         out_file.close()
 
-    def _duplicate_check(self):
+    def wrong_clear(self):
         # 打开题库文件
         # dataKu_file = cfg.get('api', 'datajson')
         with open('../data1.json', 'r', encoding='utf8') as f:
@@ -122,13 +122,13 @@ class Tiku:
             center = dataKu[i]
             for p in dataKu[:i]:
                 if p['category'] == '挑战题' and fuzz.ratio(center['content'],
-                                                         p["content"]) > 60 and fuzz.ratio(
-                    center['options'], p["options"]) > 65:
+                                                         p["content"]) > 70 and fuzz.ratio(
+                    center['options'], p["options"]) > 80 and center['excludes'] == p["answer"] and p["answer"] != "":
                     # if p["answer"] == "":
                     try:
-                        dataKucopy.remove(center)
+                        dataKucopy.remove(p)
                         print("移除")
-                        print(center)
+                        print(p)
                     except:
                         continue
 
@@ -163,8 +163,8 @@ class Tiku:
             center = dataKu[i]
             for p in dataKu[:i]:
                 if p['category'] == '挑战题' and fuzz.ratio(center['content'],
-                                                         p["content"]) > 60 and fuzz.ratio(
-                    center['options'], p["options"]) > 65:
+                                                         p["content"]) > 70 and fuzz.ratio(
+                    center['options'], p["options"]) > 80 and center['answer'] == p["answer"] and center['answer'] != "":
                     # if p["answer"] == "":
                     try:
                         dataKucopy.remove(p)
@@ -180,6 +180,7 @@ class Tiku:
 
 if __name__ == "__main__":
     xuexitiaozhan = Tiku()
+    # xuexitiaozhan.wrong_clear()
     xuexitiaozhan.duplicate_check()
     # bq = TikuQuery()
     # bq.post("")

@@ -69,12 +69,13 @@ class TikuQuery:
             else:
                 continue
         # 如果找不到题目，模糊搜索一次
-        for dataKuItem in self.dataKu:
-            if dataKuItem['category'] == item["category"] and fuzz.ratio(dataKuItem['content'],
-                                                                         item["content"]) > 60 and fuzz.ratio(dataKuItem['options'], item["options"]) > 65:
-                return dataKuItem
-            else:
-                continue
+        # if item["category"] == "挑战题":
+        #     for dataKuItem in self.dataKu:
+        #         if dataKuItem['category'] == item["category"] and fuzz.ratio(dataKuItem['content'],
+        #                                                                      item["content"]) > 70 and fuzz.ratio(dataKuItem['options'], item["options"]) > 80:
+        #             return dataKuItem
+        #         else:
+        #             continue
         return None
 
     def post_2(self, item):
@@ -93,12 +94,14 @@ class TikuQuery:
                 return dataKuItem
             else:
                 continue
-        for dataKuItem in self.dataKu:
-            if dataKuItem['category'] == item["category"] and fuzz.ratio(dataKuItem['content'],
-                                                                         item["content"]) > 60 and fuzz.ratio(dataKuItem['options'], item["options"]) > 65:
-                return dataKuItem
-            else:
-                continue
+        # 如果找不到题目，模糊搜索一次
+        # if item["category"] == "挑战题":
+        #     for dataKuItem in self.dataKu:
+        #         if dataKuItem['category'] == item["category"] and fuzz.ratio(dataKuItem['content'],
+        #                                                                      item["content"]) > 70 and fuzz.ratio(dataKuItem['options'], item["options"]) > 80:
+        #             return dataKuItem
+        #         else:
+        #             continue
         return None
 
     def post_precise(self, item):
@@ -110,12 +113,15 @@ class TikuQuery:
         if item["category"] == "单选题":
             item["category"] == "挑战题"
         logger.debug(f'GET {item["content"]}...')
-        for dataKuItem in self.dataKu:
-            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem['options'] == item["options"]:
-                return dataKuItem
-            else:
-                continue
-        return None
+        # for dataKuItem in self.dataKu:
+        #     if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem['options'] == item["options"] and dataKuItem['answer'] == item["answer"]:
+        #         return dataKuItem
+        #     else:
+        #         continue
+        if self.dataKu.count(item) == 0:
+            return False
+        else:
+            return True
 
     def put(self, item):
         if "" == item["content"]:

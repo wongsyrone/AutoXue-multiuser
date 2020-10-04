@@ -467,11 +467,10 @@ class App(Automation):
                 logger.debug("题目类型非法")
 
     def _update_bank(self, item):
-        # # return  # 关闭更新功能，看到这里的朋友不要乱改哦，因为API已经拒绝了更新请求，改了也没用
-        if self.query_local.post_precise(item) is None:
-            self.query_local.put(item)
-        else:
+        if self.query_local.post_precise(item):
             return
+        else:
+            self.query_local.put(item)
 
     # 争上游模块初始化
     def _zhengshangyou_init(self):
@@ -530,16 +529,16 @@ class App(Automation):
             options = [x.get_attribute("name") for x in option_elements]
             length_of_options = len(options)
             logger.info(f'<{num}> {content}')
-            # 此处题目类型为”单选题“，不应该是挑战题，目前所有挑战题都是单选题。
+            # 此处题目类型为”挑战题“，所有单选均改为挑战题
             answer = self._verify(category='挑战题', content=content, options=options)
             delay_time = random.randint(self.challenge_delay_bot, self.challenge_delay_top)
             if 0 == num:
                 offset = random.randint(1, length_of_options - 1)  # randint居然包含上限值，坑爹！！！
                 logger.info(f'已完成指定题量，设置提交选项偏移 -{offset}')
-                logger.info(
-                    f'随机延时 {delay_time} 秒提交答案: {chr((ord(answer) - 65 - offset + length_of_options) % length_of_options + 65)}')
-            else:
-                logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
+                # logger.info(
+                #     f'随机延时 {delay_time} 秒提交答案: {chr((ord(answer) - 65 - offset + length_of_options) % length_of_options + 65)}')
+
+                # logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
             time.sleep(delay_time)
             # 利用python切片的特性，即使索引值为-offset，可以正确取值
             # if answer is None:
@@ -741,7 +740,7 @@ class App(Automation):
             # 此处题目类型为”单选题“，不应该是挑战题，目前所有挑战题都是单选题。
             answer = self._verify(category='挑战题', content=content, options=options)
             delay_time = 0
-            logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
+            # logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
             try:
                 option_elements[ord(answer) - 65].click()
             except:
