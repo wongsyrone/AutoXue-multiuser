@@ -35,7 +35,7 @@ def start():
     logger.debug(f'视听学习置后')
     app.music()
     # app.poem()
-    shuffle([app.daily, app.challenge, app.zhengshangyou, app.shuangrenduizhan, app.read, app.weekly])
+    shuffle([app.daily, app.challenge, app.zhengshangyou, app.shuangrenduizhan, app.special, app.read, app.weekly])
     app.view_score()
     app.watch()
     app.logout_or_not()
@@ -44,8 +44,15 @@ def start():
     # app.driver.quit()
 
 
+def connect_error(exMess):
+    if "An unknown server-side error occurred while processing the command" in exMess:
+        return True
+    else:
+        return False
+
+
 def test():
-    app.shuangrenduizhan()
+    app.challenge_test()
     logger.info(f'测试完毕')
 
 
@@ -68,7 +75,7 @@ if __name__ == "__main__":
             user_list.append(username)
             users_list.append(user_list)
             # print(user_list)
-            # user_list = []
+            user_list = []
             user_value = True
     print("本次学习以下账号：")
     print(users_list)
@@ -89,7 +96,19 @@ if __name__ == "__main__":
                 start()
                 break
             except Exception as ex:
-                app.refresh()
+                logger.info("刷分出现如下错误:")
+                logger.info(ex)
+                if "An unknown server-side error occurred while processing" in str(ex):
+                    try:
+                        logger.info("尝试重启APP")
+                        app.driver.close_app()
+                        app.driver.session.clear()
+                        app.driver.quit()
+                        app = App()
+                    except:
+                        app = App()
+                else:
+                    app.refresh(3)
                 if time.time() - t > 3600:
                     logger.info(f'程序存在错误，试了一个小时都不行，换下个号码刷')
                     break
