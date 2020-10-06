@@ -705,6 +705,77 @@ class App(Automation):
         self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
         return num
 
+    def _zhengshangyou_fast_cycle(self):
+        time.sleep(3)
+        self.safe_click(rules['zhengshangyou_entry'])
+        num = 1
+        self.wait.until(EC.presence_of_element_located(
+            (By.XPATH, '//*[@text="开始比赛"]')))
+        self.safe_click('//*[@text="开始比赛"]')
+        time.sleep(5)
+        last_content = ""
+        while True:
+            try:
+                content = self.wait.until(EC.presence_of_element_located(
+                    (By.XPATH, rules['challenge_content']))).get_attribute("name")
+                # logger.info(content)
+            except:
+                time.sleep(0.5)
+                try:
+                    # time.sleep(1)
+                    self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                    # zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                    logger.info(f'本轮挑战结束')
+                    time.sleep(5)
+                    # self.safe_back()
+                    break
+                except:
+                    continue
+            init_content = content
+            if content == last_content:
+                # logger.info(f'等待题目刷新！')
+                continue
+            content = content.replace("\x20", " ")
+            content = content.replace("\xa0", " ")[3:]
+            # content = content[3:]
+            # logger.info(f'<{num}> {content}')
+            answer = self.query_local.query_with_content(content)
+            if answer != "":
+                option_elements = self.wait.until(EC.presence_of_all_elements_located(
+                    (By.XPATH, rules['challenge_options'])))
+                # logger.info(f"直接找到答案{answer}")
+                try:
+                    option_elements[ord(answer) - 65].click()
+                except:
+                    try:
+                        self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
+                        logger.info(f'本轮挑战结束,居然tm输给了别人！！！')
+                        break
+                    except:
+                        break
+            else:
+                option_elements = self.wait.until(EC.presence_of_all_elements_located(
+                    (By.XPATH, rules['challenge_options'])))
+                options = [x.get_attribute("name")[3:] for x in option_elements]
+                # logger.info(f'<{num}> {content}')
+                answer = self._verify(category='挑战题', content=content, options=options)
+                try:
+                    option_elements[ord(answer) - 65].click()
+                except:
+                    try:
+                        self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
+                        logger.info(f'本轮挑战结束,居然tm输给了别人！！！')
+                        break
+                    except:
+                        break
+
+            # logger.debug(f'本题回答完毕，抓紧继续下一题')
+            last_content = init_content
+            num += 1
+        # 更新后挑战答题需要增加一次返回
+        self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
+        return num
+
     def _2_ren_cycle(self):
         self.safe_click(rules['shuangrenduizhan_entry'])
         num = 1
@@ -722,45 +793,49 @@ class App(Automation):
         # self.wait.until(EC.presence_of_element_located(
         #     (By.XPATH, '//*[@text="开始对战"]')))
         self.safe_click('//*[@text="开始对战"]')
-        time.sleep(5)
+        last_content = ""
         while True:
             try:
                 content = self.wait.until(EC.presence_of_element_located(
                     (By.XPATH, rules['challenge_content']))).get_attribute("name")
+                # logger.info(content)
             except:
-                logger.info(f'获取不到题目，八成输了，结束本轮！')
-                break
+                time.sleep(0.5)
+                try:
+                    # time.sleep(1)
+                    self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                    # zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
+                    logger.info(f'本轮挑战结束')
+                    time.sleep(5)
+                    # self.safe_back()
+                    break
+                except:
+                    continue
+            init_content = content
+            if content == last_content:
+                # logger.info(f'等待题目刷新！')
+                continue
             content = content.replace("\x20", " ")
-            content = content.replace("\xa0", " ")
-            content = content[3:]
+            content = content.replace("\xa0", " ")[3:]
+            # content = content[3:]
+            # logger.info(f'<{num}> {content}')
             option_elements = self.wait.until(EC.presence_of_all_elements_located(
                 (By.XPATH, rules['challenge_options'])))
-            options = [x.get_attribute("name") for x in option_elements]
-            logger.info(f'<{num}> {content}')
-            # 此处题目类型为”单选题“，不应该是挑战题，目前所有挑战题都是单选题。
+            options = [x.get_attribute("name")[3:] for x in option_elements]
+            # logger.info(f'<{num}> {content}')
             answer = self._verify(category='挑战题', content=content, options=options)
-            delay_time = 0
-            # logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
             try:
                 option_elements[ord(answer) - 65].click()
             except:
-                # time.sleep(1)
-                self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
-                # zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
-                logger.info(f'本轮挑战结束,居然tm输给了别人！！！')
-                break
-            try:
-                time.sleep(1)
-                self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
-                # zsyend = self.driver.find_element_by_xpath('//*[@text="正确数/总题数"]')
-                logger.info(f'本轮挑战结束')
-                time.sleep(2)
-                break
-            except:
-                logger.debug(f'本题回答完毕，管他对不对，抓紧继续下一题')
-                time.sleep(2)
-                num += 1
-
+                try:
+                    self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
+                    logger.info(f'本轮挑战结束,居然tm输给了别人！！！')
+                    break
+                except:
+                    break
+            # logger.debug(f'本题回答完毕，抓紧继续下一题')
+            last_content = init_content
+            num += 1
         # 更新后挑战答题需要增加一次返回
         self.safe_back('share_page -> quiz')  # 发现部分模拟器返回无效
         return num
@@ -1093,14 +1168,14 @@ class App(Automation):
                 "notes": ""
             })
         except:
-            self._update_bank({
-                "category": "多选题",
-                "content": content,
-                "options": options,
-                "answer": answer,
-                "excludes": "",
-                "notes": ""
-            })
+            # self._update_bank({
+            #     "category": "多选题",
+            #     "content": content,
+            #     "options": options,
+            #     "answer": answer,
+            #     "excludes": "",
+            #     "notes": ""
+            # })
             return
 
     def _dispatch(self, count_of_each_group):

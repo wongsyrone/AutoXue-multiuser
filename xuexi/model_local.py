@@ -64,7 +64,8 @@ class TikuQuery:
         # logger.debug(f'GET {item["content"]}...')
         # 精确查找一次
         for dataKuItem in self.dataKu:
-            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem['options'] == item["options"]:
+            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[
+                'options'] == item["options"]:
                 return dataKuItem
             else:
                 continue
@@ -77,6 +78,28 @@ class TikuQuery:
         #         else:
         #             continue
         return None
+
+    def query_with_content(self, content):
+
+        # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
+        if "" == content:
+            logger.debug(f'content is empty')
+            return None
+
+        logger.debug(f'query with {content}...')
+        # 精确查找一次
+        answer_count = 0
+        answer = ""
+        for dataKuItem in self.dataKu:
+            if dataKuItem['content'] == content:
+                answer_count += 1
+                answer = dataKuItem['answer']
+            else:
+                continue
+        if answer_count == 1:
+            return answer
+        else:
+            return ""
 
     def post_2(self, item):
         # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')

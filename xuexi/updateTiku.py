@@ -18,7 +18,6 @@ from bs4 import BeautifulSoup
 
 # 创建题库类
 from fuzzywuzzy import fuzz
-import Levenshtein
 
 
 class Tiku:
@@ -58,6 +57,7 @@ class Tiku:
         #     return True
         # else:
         #     return False
+
 
     # 获取试题
     def get_tiku(self):
@@ -164,7 +164,7 @@ class Tiku:
             for p in dataKu[:i]:
                 if p['category'] == '挑战题' and fuzz.ratio(center['content'],
                                                          p["content"]) > 70 and fuzz.ratio(
-                    center['options'], p["options"]) > 80 and center['answer'] == p["answer"] and center['answer'] != "":
+                    center['options'], p["options"]) > 85 and center['answer'] == p["answer"] and center['answer'] != "":
                     # if p["answer"] == "":
                     try:
                         dataKucopy.remove(p)
