@@ -517,8 +517,6 @@ class App(Automation):
         while num > -1:
             content = self.wait.until(EC.presence_of_element_located(
                 (By.XPATH, rules['challenge_content']))).get_attribute("name")
-            # content = content.decode(encoding='UTF-8')
-            # content = re.sub("\"", "", content)
             content = content.replace("\x20", " ")
             content = content.replace("\xa0", " ")
             # logger.info(content)
@@ -1590,7 +1588,7 @@ class App(Automation):
             logger.info(f'视听学习完毕，正在返回...')
             self.safe_back('video -> bailing')
             logger.debug(f'正在返回首页...')
-            self.safe_click(rules['home_entry'])
+            self.safe_click(rules['//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"'])
 
     def refresh(self, num):
         while num > 0:

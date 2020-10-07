@@ -59,7 +59,7 @@ class TikuQuery:
             return None
         # 单选题挑战题一致
         if item["category"] == "单选题":
-            item["category"] == "挑战题"
+            item["category"] = "挑战题"
 
         # logger.debug(f'GET {item["content"]}...')
         # 精确查找一次
@@ -108,7 +108,7 @@ class TikuQuery:
             return None
         # 单选题挑战题一致
         if item["category"] == "单选题":
-            item["category"] == "挑战题"
+            item["category"] = "挑战题"
         logger.debug(f'GET {item["content"]}...')
         for dataKuItem in self.dataKu:
             if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and \
@@ -134,7 +134,7 @@ class TikuQuery:
             return None
         # 单选题挑战题一致
         if item["category"] == "单选题":
-            item["category"] == "挑战题"
+            item["category"] = "挑战题"
         logger.debug(f'GET {item["content"]}...')
         # for dataKuItem in self.dataKu:
         #     if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem['options'] == item["options"] and dataKuItem['answer'] == item["answer"]:
@@ -153,7 +153,7 @@ class TikuQuery:
         logger.debug(f'PUT {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
         # 单选题挑战题一致
         if item["category"] == "单选题":
-            item["category"] == "挑战题"
+            item["category"] = "挑战题"
         try:
             out_file = open("./data1.json", "w", encoding='utf8')
             self.dataKu.append(item)
@@ -172,7 +172,7 @@ class TikuQuery:
             return None
         # 单选题挑战题一致
         if item["category"] == "单选题":
-            item["category"] == "挑战题"
+            item["category"] = "挑战题"
         logger.debug(f'GET {item["content"]}...')
         for dataKuItem in self.dataKu:
             if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[
