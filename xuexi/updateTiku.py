@@ -163,8 +163,12 @@ class Tiku:
             center = dataKu[i]
             for p in dataKu[:i]:
                 if p['category'] == '挑战题' and fuzz.ratio(center['content'],
-                                                         p["content"]) > 70 and fuzz.ratio(
-                    center['options'], p["options"]) > 85 and center['answer'] == p["answer"] and center['answer'] != "":
+                                                         p["content"]) > 75 and fuzz.ratio(
+                    center['options'], p["options"]) > 90 and center['answer'] == p["answer"] and center['answer'] != "":
+                # if p['category'] == '挑战题' and fuzz.ratio(center['content'],
+                #                                          p["content"]) > 70 and fuzz.ratio(
+                #     center['options'], p["options"]) > 85 and p["answer"] != "" and center[
+                #     'answer'] == "":
                     # if p["answer"] == "":
                     try:
                         dataKucopy.remove(p)

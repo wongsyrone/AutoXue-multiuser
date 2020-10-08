@@ -1258,7 +1258,7 @@ class App(Automation):
             self.read_count = 0
             self.read_delay = random.randint(45, 60)
         else:
-            self.read_count = (t - g) // 2 + 1
+            self.read_count = (t - g) // 2 + 3
             # self.read_count = random.randint(
             #     cfg.getint('prefers', 'article_count_min'),
             #     cfg.getint('prefers', 'article_count_max'))
@@ -1340,7 +1340,7 @@ class App(Automation):
                 article.click()
                 num -= 1
                 logger.info(f'<{num}> 当前篇目 {title}')
-                article_delay = random.randint(90, 90 + min(10, self.read_count))
+                article_delay = random.randint(60, 60 + min(10, self.read_count))
                 logger.info(f'阅读时间估计 {article_delay} 秒...')
                 while article_delay > 0:
                     if article_delay < 20:
@@ -1367,8 +1367,8 @@ class App(Automation):
                 self.safe_back('article -> list')
                 if 0 >= num:
                     break
-            else:
-                self.swipe_up()
+                else:
+                    self.swipe_up()
 
     def _comment_only(self, ssc_count):
         logger.info(f'评论，转发{ssc_count} 则')
@@ -1460,8 +1460,6 @@ class App(Automation):
                     # self.safe_back('mine -> home')
                     self.driver.scroll(vol, first_vol, duration=500)
                     right_slide = right_slide - 1
-            else:
-                self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
 
     def read(self):
         logger.info(f"阅读 {self.read_count} 篇文章")
@@ -1486,8 +1484,8 @@ class App(Automation):
             return
         logger.debug(f'正在进行新闻学习...')
         # 找指定的新闻阅读频道
-        self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
-        self._get_article_vol()
+        # self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
+        # self._get_article_vol()
         self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"]')
         self._kaleidoscope()
         self._get_article_vol()
@@ -1688,8 +1686,7 @@ class App(Automation):
                     return
                 except:
                     continue
-            else:
-                break
+
         titles[0].click()
         logger.info(f'专项答题, 开始！')
         time.sleep(random.randint(1, 3))
@@ -1713,6 +1710,7 @@ class App(Automation):
         time.sleep(3)
         self._special()
         self.safe_back('quiz -> mine')
+
 
     def _special_dispatch(self, count_of_each_group):
         time.sleep(3)  # 如果模拟器比较流畅，这里的延时可以适当调短

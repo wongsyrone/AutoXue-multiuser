@@ -65,7 +65,7 @@ class TikuQuery:
         # 精确查找一次
         for dataKuItem in self.dataKu:
             if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[
-                'options'] == item["options"]:
+                'options'] == item["options"] and dataKuItem['excludes'] == "":
                 return dataKuItem
             else:
                 continue
@@ -135,6 +135,9 @@ class TikuQuery:
         # 单选题挑战题一致
         if item["category"] == "单选题":
             item["category"] = "挑战题"
+        # if item["excludes"] != "":
+        #     item["answer"] = item["excludes"]
+        #     item["excludes"] = ""
         logger.debug(f'GET {item["content"]}...')
         # for dataKuItem in self.dataKu:
         #     if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem['options'] == item["options"] and dataKuItem['answer'] == item["answer"]:
