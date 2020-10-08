@@ -6,14 +6,12 @@
 @time: 2020年9月29日10:55:28
 @Copyright © 2020. All rights reserved.
 """
-import subprocess
-from argparse import ArgumentParser
-import time
-from . import App
-from .unit import logger, usernames
-from .secureRandom import SecureRandom as random
 import sys
-from xuexi.updateTiku import Tiku
+import time
+
+from . import App
+from .secureRandom import SecureRandom as random
+from .unit import logger, usernames
 
 
 # parse = ArgumentParser(description="Accept username and password if necessary!")
