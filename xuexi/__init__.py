@@ -1358,7 +1358,7 @@ class App(Automation):
                     logger.debug(f'延时 {delay} 秒...')
                     time.sleep(delay)
                     article_delay -= delay
-                    self.swipe_up()
+                    # self.swipe_up()
                 else:
                     logger.debug(f'完成阅读 {title}')
 
@@ -1594,7 +1594,7 @@ class App(Automation):
             logger.info(f'视听学习完毕，正在返回...')
             self.safe_back('video -> bailing')
             logger.debug(f'正在返回首页...')
-            self.safe_click(rules['//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"'])
+            # self.safe_click(rules['//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"'])
 
     def refresh(self, num):
         while num > 0:
