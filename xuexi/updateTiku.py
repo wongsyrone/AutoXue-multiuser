@@ -162,14 +162,13 @@ class Tiku:
         for i in range(len(dataKu) - 1, -1, -1):
             center = dataKu[i]
             for p in dataKu[:i]:
+                #  找到新题库与旧题库内容答案不一致的条目，删除就题库条目
                 if p['category'] == '挑战题' and fuzz.ratio(center['content'],
-                                                         p["content"]) > 75 and fuzz.ratio(
-                    center['options'], p["options"]) > 90 and center['answer'] == p["answer"] and center['answer'] != "":
-                # if p['category'] == '挑战题' and fuzz.ratio(center['content'],
-                #                                          p["content"]) > 70 and fuzz.ratio(
-                #     center['options'], p["options"]) > 85 and p["answer"] != "" and center[
-                #     'answer'] == "":
-                    # if p["answer"] == "":
+                                                         p["content"]) > 90 and fuzz.ratio(
+                    center['options'], p["options"]) > 95 and center['answer'] == p["answer"] and center['answer'] != "":
+
+                # 找到排除答案的重叠条目
+                # if p['category'] == '挑战题' and center['content'] == p["content"] and center['options'] == p["options"] and p["answer"] == center['excludes']:
                     try:
                         dataKucopy.remove(p)
                         print("移除")

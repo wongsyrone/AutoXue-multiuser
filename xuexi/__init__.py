@@ -130,6 +130,13 @@ class Automation:
             return
         time.sleep(1)  # 点击后延时1秒，如果模拟器渲染较慢，可以适当增大这个延时
 
+    # 发送文件
+    def CodePic_to_phone(self, CodePicPath, PhonePath):
+        logger.info(f'正在发送登录二维码图片，请稍候...')
+        if 0 == subprocess.check_call(f'adb push {CodePicPath} {PhonePath}', shell=True, stdout=subprocess.PIPE):
+            logger.info(f'发送二维码成功')
+        else:
+            logger.info(f'发送二维码失败')
     # def __del__(self):
     #     self.driver.close_app()
     #     self.driver.quit()
@@ -254,7 +261,8 @@ class App(Automation):
         except:
             logger.info("没有等到得分页面！")
             try:
-                cancel = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@text="取消"] or @text="退出"] or @text="等待"]')))
+                cancel = self.wait.until(
+                    EC.presence_of_all_elements_located((By.XPATH, '//*[@text="取消"] or @text="退出"] or @text="等待"]')))
                 logger.info("app响应慢，你的机器好卡顿啊！")
                 cancel.click()
             except:
@@ -1710,7 +1718,6 @@ class App(Automation):
         time.sleep(3)
         self._special()
         self.safe_back('quiz -> mine')
-
 
     def _special_dispatch(self, count_of_each_group):
         time.sleep(3)  # 如果模拟器比较流畅，这里的延时可以适当调短

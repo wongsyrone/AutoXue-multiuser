@@ -62,21 +62,20 @@ class TikuQuery:
             item["category"] = "挑战题"
 
         # logger.debug(f'GET {item["content"]}...')
-        # 精确查找一次
+        # 精确查询答案
         for dataKuItem in self.dataKu:
             if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[
-                'options'] == item["options"] and dataKuItem['excludes'] == "":
+                'options'] == item["options"] and dataKuItem['answer'] != "":
                 return dataKuItem
             else:
                 continue
-        # 如果找不到题目，模糊搜索一次
-        # if item["category"] == "挑战题":
-        #     for dataKuItem in self.dataKu:
-        #         if dataKuItem['category'] == item["category"] and fuzz.ratio(dataKuItem['content'],
-        #                                                                      item["content"]) > 70 and fuzz.ratio(dataKuItem['options'], item["options"]) > 80:
-        #             return dataKuItem
-        #         else:
-        #             continue
+        # 精确查询排除答案的条码
+        for dataKuItem in self.dataKu:
+            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and dataKuItem[
+                'options'] == item["options"] and dataKuItem['excludes'] != "":
+                return dataKuItem
+            else:
+                continue
         return None
 
     def query_with_content(self, content):
@@ -127,6 +126,18 @@ class TikuQuery:
         #             continue
         return None
 
+    def find_excludes_item(self, item):
+
+        logger.debug(f'Find excludes item: {item["content"]}...')
+        for dataKuItem in self.dataKu:
+            if dataKuItem['category'] == item["category"] and dataKuItem['content'] == item["content"] and \
+                    dataKuItem[
+                        'options'] == item["options"] and item["excludes"] != "":
+                return dataKuItem
+            else:
+                continue
+        return None
+
     def post_precise(self, item):
         logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
         if "" == item["content"]:
@@ -157,6 +168,12 @@ class TikuQuery:
         # 单选题挑战题一致
         if item["category"] == "单选题":
             item["category"] = "挑战题"
+        # 判断是否是错误答案的题库条目
+        if item["excludes"] != "":
+            excludeItem = self.find_excludes_item(item)
+            if excludeItem is not None:
+                item["excludes"] = item["excludes"] + excludeItem["excludes"]
+                self.dataKu.remove(excludeItem)
         try:
             out_file = open("./data1.json", "w", encoding='utf8')
             self.dataKu.append(item)

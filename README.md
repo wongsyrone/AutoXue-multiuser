@@ -1,6 +1,16 @@
 # 写在最前
 这个项目完全是为了学习python，学习了原AutoXue的项目，项目地址 https://github.com/kessil/AutoXue
 因为原作者没有更新，因此拿来作为研究学习之用，请遵守开源许可协议。严禁用于商业用途，禁止使用进行任何盈利活动。对一切非法使用所产生的后果，本人概不负责。
+# 使用方法，一定要先读！！
+1、配置环境，参考原作者的配置教程，这点非常重要
+
+2、运行setup.cmd,如果安装不上相关组件，用记事本打开，手动安装
+
+3、用户名在default.ini里配置，可以配置多用户，也可以单用户。一定要配置！！
+
+4、如果是新的模拟器第一次登录，必须提前登录用一次，把各种提示刷没了，否则app提示操作会导致程序崩溃；
+
+
 # 2020年10月8日
 1、修复了若干bug，目前版本争上游答题效率优化的比较好了，通过测试80%以上概率夺冠。当然星星越高难度越大，因为要检索文件，肯定赶不上刷题狂，那些高星用户，都是看了题目就本能反应答案的，干不过他们。
 
@@ -81,7 +91,7 @@ https://blog.csdn.net/sky_limitless/article/details/90291893
 5. 安装`Python`，请至少使用3.7+版本，推荐3.8
 
 ## 使用方法(windows)
-0. 克隆项目 `git clone https://github.com/kessil/AutoXue.git --depth 1`
+0. 克隆项目 `git clone https://github.com/SpringCity-LaoYang/AutoXue-multiuser.git --depth 1`
 1. 双击运行`setup.cmd`
 2. 启动 `Appium` 和 `Nox`
 3. 双击运行 `start.cmd`
