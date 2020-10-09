@@ -50,7 +50,8 @@ def connect_error(exMess):
 
 
 def test():
-    app.challenge_test()
+    app.CodePic_to_phone("C:\Users\yangz\Desktop\下载.png", "/system/temp/")
+    # app.challenge_test()
     # app.zhengshangyou()
     logger.info(f'测试完毕')
 

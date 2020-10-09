@@ -17,7 +17,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # 创建题库类
-from fuzzywuzzy import fuzz
+# from fuzzywuzzy import fuzz
 
 
 class Tiku:
@@ -111,7 +111,7 @@ class Tiku:
         # json.dump(item_all, out_file, indent=6, ensure_ascii=False)
         out_file.write("]\n")
         out_file.close()
-
+    '''判断错误记录，暂时屏蔽
     def wrong_clear(self):
         # 打开题库文件
         # dataKu_file = cfg.get('api', 'datajson')
@@ -135,6 +135,7 @@ class Tiku:
         out_file = open("../data_back.json", "w", encoding='utf8')
         json.dump(dataKucopy, out_file, indent=6, ensure_ascii=False)
         out_file.close()
+    '''
 
     def _delete_blank(self):
         # 打开题库文件
@@ -152,7 +153,7 @@ class Tiku:
         out_file = open("../data_back.json", "w", encoding='utf8')
         json.dump(dataKu, out_file, indent=6, ensure_ascii=False)
         out_file.close()
-
+    '''
     def duplicate_check(self):
         # 打开题库文件
         # dataKu_file = cfg.get('api', 'datajson')
@@ -179,7 +180,7 @@ class Tiku:
         out_file = open("../data_back.json", "w", encoding='utf8')
         json.dump(dataKucopy, out_file, indent=6, ensure_ascii=False)
         out_file.close()
-
+    '''
 
 if __name__ == "__main__":
     xuexitiaozhan = Tiku()

@@ -8,7 +8,7 @@
 """
 import json
 from xuexi.unit import cfg, logger
-from fuzzywuzzy import fuzz
+# from fuzzywuzzy import fuzz
 
 
 class Structure:
