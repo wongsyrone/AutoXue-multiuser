@@ -133,6 +133,11 @@ class Automation:
     # 发送文件
     def CodePic_to_phone(self, CodePicPath, PhonePath):
         logger.info(f'正在发送登录二维码图片，请稍候...')
+        if 0 == subprocess.check_call(f'adb remount', shell=True, stdout=subprocess.PIPE):
+            logger.info(f'adb remount 成功')
+            time.sleep(5)
+        else:
+            logger.info(f'adb remount 失败')
         if 0 == subprocess.check_call(f'adb push {CodePicPath} {PhonePath}', shell=True, stdout=subprocess.PIPE):
             logger.info(f'发送二维码成功')
         else:
@@ -172,7 +177,7 @@ class App(Automation):
     def initapp(self, username="", password=""):
         self.username = username
         self.password = password
-        self.login_or_not()
+        # self.login_or_not()
         self.view_score()
         self._read_init()
         self._view_init()
