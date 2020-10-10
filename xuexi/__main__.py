@@ -51,8 +51,8 @@ def connect_error(exMess):
 
 
 def test():
-    app.CodePic_to_phone("./BarcodePic/二维码.png", "/system/temp/")
-    logger.info(f'传输照片到手机成功')
+    app.CodePic_to_phone("./BarcodePic/二维码.png", "/system/temp/二维码.png")
+    # logger.info(f'传输照片到手机成功')
     app.scan_barcode()
     # app.challenge_test()
     # app.zhengshangyou()

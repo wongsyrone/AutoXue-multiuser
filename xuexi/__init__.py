@@ -135,12 +135,24 @@ class Automation:
         logger.info(f'正在发送登录二维码图片，请稍候...')
         if 0 == subprocess.check_call(f'adb remount', shell=True, stdout=subprocess.PIPE):
             logger.info(f'remount 成功')
+            time.sleep(3)
         else:
             logger.info(f'remount 失败')
-        if 0 == subprocess.check_call(f'adb push {CodePicPath} {PhonePath}', shell=True, stdout=subprocess.PIPE):
-            logger.info(f'发送二维码成功')
-        else:
-            logger.info(f'发送二维码失败')
+        try:
+            if 0 == subprocess.check_call(f'adb push {CodePicPath} {PhonePath}', shell=True, stdout=subprocess.PIPE):
+                logger.info(f'发送二维码成功')
+            else:
+                logger.info(f'发送二维码失败')
+        except Exception as ex:
+            logger.info(ex)
+        try:
+            if 0 == subprocess.check_call(f'adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Pictures/二维码.png', shell=True, stdout=subprocess.PIPE):
+                logger.info(f'广播成功')
+            else:
+                logger.info(f'广播失败')
+        except Exception as ex:
+            logger.info(ex)
+
     # def __del__(self):
     #     self.driver.close_app()
     #     self.driver.quit()
@@ -1745,7 +1757,7 @@ class App(Automation):
     # 扫描文件
     def scan_barcode(self):
         self.safe_click('//*[@text="强国通"]')
-        self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_action_bar_button_icon"]')
+        self.safe_click('//*[@resource-id="cn.xuexi.android:id/ll_more"]')
         self.safe_click('//*[@text="扫一扫"]')
         self.safe_click('//*[@text="相册"]')
 
