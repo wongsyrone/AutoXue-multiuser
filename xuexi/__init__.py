@@ -1599,7 +1599,7 @@ class App(Automation):
             self.safe_back('video -> bailing')
             logger.debug(f'正在返回首页...')
             # self.safe_click(rules['//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"'])
-
+            self.view_score()
     def refresh(self, num):
         while num > 0:
             num -= 1
