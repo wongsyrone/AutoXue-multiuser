@@ -133,6 +133,10 @@ class Automation:
     # 发送文件
     def CodePic_to_phone(self, CodePicPath, PhonePath):
         logger.info(f'正在发送登录二维码图片，请稍候...')
+        if 0 == subprocess.check_call(f'adb remount', shell=True, stdout=subprocess.PIPE):
+            logger.info(f'remount 成功')
+        else:
+            logger.info(f'remount 失败')
         if 0 == subprocess.check_call(f'adb push {CodePicPath} {PhonePath}', shell=True, stdout=subprocess.PIPE):
             logger.info(f'发送二维码成功')
         else:
@@ -172,7 +176,7 @@ class App(Automation):
     def initapp(self, username="", password=""):
         self.username = username
         self.password = password
-        self.login_or_not()
+        # self.login_or_not()
         self.view_score()
         self._read_init()
         self._view_init()
@@ -1594,6 +1598,7 @@ class App(Automation):
             logger.info(f'视听学习完毕，正在返回...')
             self.safe_back('video -> bailing')
             logger.debug(f'正在返回首页...')
+            self.view_score()
             # self.safe_click(rules['//*[@resource-id="cn.xuexi.android:id/home_bottom_tab_button_work"'])
 
     def refresh(self, num):
@@ -1736,3 +1741,12 @@ class App(Automation):
                 self._check()
             else:
                 logger.error(f"未知的题目类型: {category}")
+
+    # 扫描文件
+    def scan_barcode(self):
+        self.safe_click('//*[@text="强国通"]')
+        self.safe_click('//*[@resource-id="cn.xuexi.android:id/home_action_bar_button_icon"]')
+        self.safe_click('//*[@text="扫一扫"]')
+        self.safe_click('//*[@text="相册"]')
+
+
