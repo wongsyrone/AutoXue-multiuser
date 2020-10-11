@@ -1698,7 +1698,8 @@ class App(Automation):
                     return
                 except:
                     continue
-
+            else:
+                break
         titles[0].click()
         logger.info(f'专项答题, 开始！')
         time.sleep(random.randint(1, 3))
