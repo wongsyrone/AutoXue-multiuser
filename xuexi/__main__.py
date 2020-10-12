@@ -95,11 +95,11 @@ if __name__ == "__main__":
         t = time.time()
         while True:
             try:
-                # app.initapp(user[0], user[1])
-                # start()
-                driver_login = mydriver.Mydriver(nohead=False)
-                cookies = driver_login.login()
-                test()
+                app.initapp(user[0], user[1])
+                start()
+                # driver_login = mydriver.Mydriver(nohead=False)
+                # cookies = driver_login.login()
+                # test()
                 break
             except Exception as ex:
                 logger.info("刷分出现如下错误:")

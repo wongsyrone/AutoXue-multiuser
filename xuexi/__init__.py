@@ -188,7 +188,7 @@ class App(Automation):
     def initapp(self, username="", password=""):
         self.username = username
         self.password = password
-        # self.login_or_not()
+        self.login_or_not()
         self.view_score()
         self._read_init()
         self._view_init()
@@ -1351,7 +1351,7 @@ class App(Automation):
                 try:
                     title = article.get_attribute("name")
                 except Exception as ex:
-                    logger.info(ex)
+                    logger.info(f'文章列表可能刷新了，找不到了，重新获取，请忽略以下错误：{ex}')
                     continue
                 if title in self.titles:
                     continue
@@ -1374,7 +1374,7 @@ class App(Automation):
                     logger.debug(f'延时 {delay} 秒...')
                     time.sleep(delay)
                     article_delay -= delay
-                    # self.swipe_up()
+                    self.swipe_up()
                 else:
                     logger.debug(f'完成阅读 {title}')
 
@@ -1391,8 +1391,7 @@ class App(Automation):
                 self.safe_back('article -> list')
                 if 0 >= num:
                     break
-                else:
-                    self.swipe_up()
+            self.swipe_up()
 
     def _comment_only(self, ssc_count):
         logger.info(f'评论，转发{ssc_count} 则')
@@ -1711,7 +1710,8 @@ class App(Automation):
                     return
                 except:
                     continue
-
+            else:
+                break
         titles[0].click()
         logger.info(f'专项答题, 开始！')
         time.sleep(random.randint(1, 3))
