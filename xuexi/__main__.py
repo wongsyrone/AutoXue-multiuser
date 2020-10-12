@@ -9,7 +9,7 @@
 import sys
 import time
 
-from pdlearn import mydriver
+
 from . import App
 from .secureRandom import SecureRandom as random
 from .unit import logger, usernames
