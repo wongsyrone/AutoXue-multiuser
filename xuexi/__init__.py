@@ -46,6 +46,7 @@ class Automation:
         logger.info('打开 appium 服务,正在配置...')
         self.driver = webdriver.Remote('http://localhost:4723/wd/hub', self.desired_caps)
         self.wait = WebDriverWait(self.driver, 15)
+        self.wait_zsy = WebDriverWait(self.driver, 15, 0.1)
         self.size = self.driver.get_window_size()
 
     def connect(self):
@@ -557,14 +558,11 @@ class App(Automation):
             if 0 == num:
                 offset = random.randint(1, length_of_options - 1)  # randint居然包含上限值，坑爹！！！
                 logger.info(f'已完成指定题量，设置提交选项偏移 -{offset}')
-                # logger.info(
-                #     f'随机延时 {delay_time} 秒提交答案: {chr((ord(answer) - 65 - offset + length_of_options) % length_of_options + 65)}')
+            logger.info(
+                f'随机延时 {delay_time} 秒提交答案: {chr((ord(answer) - 65 - offset + length_of_options) % length_of_options + 65)}')
 
-                # logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
+            logger.info(f'随机延时 {delay_time} 秒提交答案: {answer}')
             time.sleep(delay_time)
-            # 利用python切片的特性，即使索引值为-offset，可以正确取值
-            # if answer is None:
-            #     answer = "A"
             option_elements[ord(answer) - 65 - offset].click()
             try:
                 time.sleep(5)
@@ -682,7 +680,7 @@ class App(Automation):
         last_content = ""
         while True:
             try:
-                content = self.wait.until(EC.presence_of_element_located(
+                content = self.wait_zsy.until(EC.presence_of_element_located(
                     (By.XPATH, rules['challenge_content']))).get_attribute("name")
                 # logger.info(content)
             except:
@@ -703,9 +701,10 @@ class App(Automation):
                 continue
             content = content.replace("\x20", " ")
             content = content.replace("\xa0", " ")[3:]
+            # content = "".join(content.split())[3:]
             # content = content[3:]
-            # logger.info(f'<{num}> {content}')
-            option_elements = self.wait.until(EC.presence_of_all_elements_located(
+            logger.info(f'{content}')
+            option_elements = self.wait_zsy.until(EC.presence_of_all_elements_located(
                 (By.XPATH, rules['challenge_options'])))
             options = [x.get_attribute("name")[3:] for x in option_elements]
             # logger.info(f'<{num}> {content}')
@@ -736,10 +735,11 @@ class App(Automation):
         self.safe_click('//*[@text="开始比赛"]')
         time.sleep(5)
         last_content = ""
+        option_click = False
         while True:
             try:
-                content = self.wait.until(EC.presence_of_element_located(
-                    (By.XPATH, rules['challenge_content']))).get_attribute("name")
+                content = self.wait_zsy.until(EC.presence_of_element_located(
+                    (By.XPATH, rules['challenge_content1']))).get_attribute("name")
                 # logger.info(content)
             except:
                 time.sleep(0.5)
@@ -755,19 +755,29 @@ class App(Automation):
                     continue
             init_content = content
             if content == last_content:
-                # logger.info(f'等待题目刷新！')
-                continue
+                if not option_click:
+                    continue
+                else:
+                    option_elements[ord(answer) - 65].click()
+                    continue
+            option_click = False
             content = content.replace("\x20", " ")
             content = content.replace("\xa0", " ")[3:]
-            # content = content[3:]
-            # logger.info(f'<{num}> {content}')
+            # logger.info(content)
             answer = self.query_local.query_with_content(content)
             if answer != "":
-                option_elements = self.wait.until(EC.presence_of_all_elements_located(
+                option_elements = self.wait_zsy.until(EC.presence_of_all_elements_located(
                     (By.XPATH, rules['challenge_options'])))
+                # options = [x.get_attribute("name")[3:] for x in option_elements]
+                # logger.info(options)
                 # logger.info(f"直接找到答案{answer}")
                 try:
+                    # logger.info(option_elements[ord(answer) - 65])
+                    # logger.info(option_elements[ord(answer) - 65].is_displayed())
+                    # time.sleep(0.2)
                     option_elements[ord(answer) - 65].click()
+                    logger.info(f'点击选项{answer}')
+                    option_click = True
                 except:
                     try:
                         self.driver.find_element_by_xpath('//android.widget.Image/android.widget.Image[3]')
@@ -776,7 +786,7 @@ class App(Automation):
                     except:
                         break
             else:
-                option_elements = self.wait.until(EC.presence_of_all_elements_located(
+                option_elements = self.wait_zsy.until(EC.presence_of_all_elements_located(
                     (By.XPATH, rules['challenge_options'])))
                 options = [x.get_attribute("name")[3:] for x in option_elements]
                 # logger.info(f'<{num}> {content}')
@@ -1453,7 +1463,7 @@ class App(Automation):
             logger.info(f"在本地学习平台驻足 {delay} 秒")
             time.sleep(delay)
             self.safe_back('学习平台 -> 文章列表')
-            time.sleep(2)
+            time.sleep(3)
 
     def _get_article_vol(self):
         vol_not_found = True
@@ -1461,12 +1471,12 @@ class App(Automation):
             # 顶多右划4次，找不到就返回
             right_slide = 3
             while right_slide >= 0:
-                try:
-                    volumns = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['article_volumn'])))
+                # try:
+                volumns = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['article_volumn'])))
                 # volumns = self.find_elements(rules['article_volumn'])
-                except:
-                    self.safe_back('mine -> home')
-                    volumns = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['article_volumn'])))
+                # except:
+                #     self.safe_back('mine -> home')
+                #     volumns = self.wait.until(EC.presence_of_all_elements_located((By.XPATH, rules['article_volumn'])))
                 first_vol = volumns[1]
                 for vol in volumns:
                     title = vol.get_attribute("name")
@@ -1716,8 +1726,8 @@ class App(Automation):
         logger.info(f'专项答题, 开始！')
         time.sleep(random.randint(1, 3))
         self._special_dispatch(10)  # 这里和每日答题不一样，首先比对题库，其次在看提示蒙题
-        self.safe_back('weekly report -> weekly list')
-        self.safe_back('weekly list -> quiz')
+        self.safe_back('special report -> special list')
+        self.safe_back('special list -> quiz')
 
     def special(self):
         """ 专项答题
@@ -1735,6 +1745,7 @@ class App(Automation):
         time.sleep(3)
         self._special()
         self.safe_back('quiz -> mine')
+        self.safe_back('mine -> home')
 
     def _special_dispatch(self, count_of_each_group):
         time.sleep(3)  # 如果模拟器比较流畅，这里的延时可以适当调短
