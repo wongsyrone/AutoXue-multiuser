@@ -28460,5 +28460,18 @@
             "answer": "",
             "excludes": "A",
             "notes": ""
+      },
+      {
+            "category": "挑战题",
+            "content": "以下不属于“天下之名巧”——马钧发明的是         。",
+            "options": [
+                  "新式织绫机",
+                  "龙骨水车",
+                  "轮转式发石机",
+                  "锯子"
+            ],
+            "answer": "D",
+            "excludes": "",
+            "notes": ""
       }
 ]
