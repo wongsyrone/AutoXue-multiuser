@@ -1464,7 +1464,7 @@ class App(Automation):
             time.sleep(delay)
             self.safe_back('学习平台 -> 文章列表')
             time.sleep(3)
-
+        self.safe_back('学习平台 -> 文章列表')
     def _get_article_vol(self):
         vol_not_found = True
         while vol_not_found:
@@ -1491,8 +1491,13 @@ class App(Automation):
                     logger.debug(f'未找到 {self.volumn_title}，右划')
                     # self.safe_click(rules['article_share'])
                     # self.safe_back('mine -> home')
-                    self.driver.scroll(vol, first_vol, duration=500)
+                    self.driver.scroll(vol, first_vol, duration=300)
                     right_slide = right_slide - 1
+                    if right_slide < 0:
+                        logger.info(f"找不到{self.volumn_title}栏目，随便点一个吧")
+                        vol.click()
+                        vol_not_found = False
+                        break
 
     def read(self):
         logger.info(f"阅读 {self.read_count} 篇文章")
