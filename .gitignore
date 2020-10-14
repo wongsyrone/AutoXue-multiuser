@@ -110,3 +110,5 @@ config/custom.ini
 start_for*.cmd
 使用帮助.html
 *.sqlite
+/venv/
+/venv/
