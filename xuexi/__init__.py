@@ -998,7 +998,7 @@ class App(Automation):
         else:
             logger.info(f'争上游走{cyclenum}波！ ')
             while cyclenum > 0:
-                result = self._zhengshangyou_fast_cycle() - 1
+                result = self._zhengshangyou_cycle() - 1
                 delay_time = random.randint(5, 10)
                 logger.info(f'本次争上游作对 {result} 题')
                 time.sleep(delay_time)
