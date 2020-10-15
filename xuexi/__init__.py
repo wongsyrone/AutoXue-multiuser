@@ -684,6 +684,8 @@ class App(Automation):
             try:
                 content = self.wait.until(EC.presence_of_element_located(
                     (By.XPATH, rules['challenge_content']))).get_attribute("name")
+                option_elements = self.wait.until(EC.presence_of_all_elements_located(
+                    (By.XPATH, rules['challenge_options'])))
                 # logger.info(content)
             except:
                 time.sleep(0.5)
@@ -702,8 +704,8 @@ class App(Automation):
             content = content.replace("\x20", " ")
             content = content.replace("\xa0", " ")[3:]
             logger.info(f'{content}')
-            option_elements = self.wait.until(EC.presence_of_all_elements_located(
-                (By.XPATH, rules['challenge_options'])))
+            # option_elements = self.wait.until(EC.presence_of_all_elements_located(
+            #     (By.XPATH, rules['challenge_options'])))
             options = [x.get_attribute("name")[3:] for x in option_elements]
             answer = self._verify(category='挑战题', content=content, options=options)
             try:
