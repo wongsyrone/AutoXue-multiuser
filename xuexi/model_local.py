@@ -94,7 +94,7 @@ class TikuQuery:
         for dataKuItem in self.dataKu:
             if dataKuItem['content'] == content:
                 if self.dataKu.count(dataKuItem) == 1:
-                    logger.info(f"根据题目找到唯一答案，直接选{dataKuItem['answer']}")
+                    logger.info(f"快点点击！---{dataKuItem['answer']}---{dataKuItem['answer']}---{dataKuItem['answer']}---")
                     return dataKuItem['answer']
                 else:
                     return ""
