@@ -9,6 +9,7 @@
 import sys
 import time
 
+
 from . import App
 from .secureRandom import SecureRandom as random
 from .unit import logger, usernames
@@ -50,9 +51,12 @@ def connect_error(exMess):
 
 
 def test():
-    # app.CodePic_to_phone("C:/Users/yangz/Desktop/下载.png", "/system/temp/")
+    # app.CodePic_to_phone("./BarcodePic/二维码.png", "/system/temp/二维码.png")
+    # # logger.info(f'传输照片到手机成功')
+    # app.scan_barcode()
     # app.challenge_test()
-    # app.zhengshangyou()
+    app.zhengshangyou()
+    # app.watch()
     logger.info(f'测试完毕')
 
 
@@ -92,8 +96,8 @@ if __name__ == "__main__":
         while True:
             try:
                 app.initapp(user[0], user[1])
-                # test()
                 start()
+                # test()
                 break
             except Exception as ex:
                 logger.info("刷分出现如下错误:")

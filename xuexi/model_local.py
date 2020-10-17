@@ -8,6 +8,8 @@
 """
 import json
 from xuexi.unit import cfg, logger
+
+
 # from fuzzywuzzy import fuzz
 
 
@@ -87,19 +89,16 @@ class TikuQuery:
 
         logger.debug(f'query with {content}...')
         # 精确查找一次
-        answer_count = 0
+
         answer = ""
         for dataKuItem in self.dataKu:
             if dataKuItem['content'] == content:
-                answer_count += 1
-                answer = dataKuItem['answer']
-            else:
-                continue
-        if answer_count == 1:
-            return answer
-        else:
-            return ""
-
+                if self.dataKu.count(dataKuItem) == 1:
+                    logger.info(f"根据题目找到唯一答案，直接选{dataKuItem['answer']}")
+                    return dataKuItem['answer']
+                else:
+                    return ""
+        return answer
     def post_2(self, item):
         # logger.debug(f'POST {item["content"]} {item["options"]} {item["answer"]} {item["excludes"]}...')
         if "" == item["content"]:
