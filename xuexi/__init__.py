@@ -1357,6 +1357,8 @@ class App(Automation):
             except:
                 logger.debug(f'真是遗憾，一屏都没有可点击的新闻')
                 articles = []
+            if not articles == []:
+                articles.pop(-1)
             for article in articles:
                 try:
                     title = article.get_attribute("name")
